@@ -1,0 +1,57 @@
+# Environment files
+.env*
+!.env.example
+
+# Dependencies
+node_modules
+
+# Build
+dist
+build
+.cache
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+
+# Strapi
+.strapi
+.strapi-updater.json
+.tmp
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads (si vous ne voulez pas les inclure)
+public/uploads/*
+
+# Tests
+coverage
+.nyc_output
+
+# Misc
+README.md
+LICENSE
+documentation
+
+Dockerfile

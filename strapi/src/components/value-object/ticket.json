@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_value_object_tickets",
+  "info": {
+    "displayName": "Ticket",
+    "icon": "file"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "quantity": {
+      "type": "integer",
+      "required": true,
+      "min": 0
+    },
+    "price": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "uuid": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

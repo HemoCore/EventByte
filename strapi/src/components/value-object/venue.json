@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_value_object_venues",
+  "info": {
+    "displayName": "Venue",
+    "icon": "pinMap"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "adress": {
+      "type": "string",
+      "required": true
+    },
+    "coordinate": {
+      "type": "customField",
+      "customField": "plugin::geodata.geojson",
+      "options": {
+        "info": false
+      }
+    }
+  },
+  "config": {}
+}

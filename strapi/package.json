@@ -1,0 +1,53 @@
+{
+    "name": "strapi",
+    "version": "0.1.0",
+    "private": true,
+    "description": "A Strapi application",
+    "scripts": {
+        "build": "strapi build",
+        "console": "strapi console",
+        "deploy": "strapi deploy",
+        "dev": "strapi develop",
+        "develop": "strapi develop",
+        "start": "strapi start",
+        "strapi": "strapi",
+        "upgrade": "npx @strapi/upgrade latest",
+        "upgrade:dry": "npx @strapi/upgrade latest --dry"
+    },
+    "dependencies": {
+        "@strapi/plugin-cloud": "5.29.0",
+        "@strapi/plugin-users-permissions": "5.29.0",
+        "@strapi/provider-upload-cloudinary": "5.29.0",
+        "@strapi/strapi": "5.29.0",
+        "@strapi/utils": "^5.29.0",
+        "amqplib": "^0.10.9",
+        "axios": "^1.13.1",
+        "deep-object-diff": "^1.1.9",
+        "knex": "^3.1.0",
+        "pg": "8.8.0",
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0",
+        "react-router-dom": "^6.0.0",
+        "strapi-geodata": "^0.1.2",
+        "styled-components": "^6.0.0",
+        "uuid": "^13.0.0"
+    },
+    "devDependencies": {
+        "@faker-js/faker": "^10.1.0",
+        "@types/amqplib": "^0.10.8",
+        "@types/node": "^20",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "faker": "link:@types/@faker-js/faker",
+        "ts-node": "^10.9.2",
+        "typescript": "^5"
+    },
+    "engines": {
+        "node": ">=18.0.0 <=22.x.x",
+        "npm": ">=6.0.0"
+    },
+    "strapi": {
+        "uuid": "d89230ae-3bd4-4e50-bfa5-283e460ceb3b",
+        "installId": "49b40cc51ae4b5324078434935b6fbd22f75f4b7b1c3ead425f51a04426b0f01"
+    }
+}

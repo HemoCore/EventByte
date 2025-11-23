@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "events",
+  "info": {
+    "singularName": "event",
+    "pluralName": "events",
+    "displayName": "Event"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "uuid": {
+      "type": "uid",
+      "required": false
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "required": true
+    },
+    "startAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "cover": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "venue": {
+      "type": "component",
+      "component": "value-object.venue",
+      "repeatable": false,
+      "required": true
+    },
+    "tickets": {
+      "type": "component",
+      "component": "value-object.ticket",
+      "repeatable": true,
+      "required": true,
+      "min": 1,
+      "max": 5
+    }
+  }
+}
