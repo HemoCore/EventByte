@@ -1,17 +1,55 @@
 # EventByte - Documentation des API
 
-## Table des matières
-1. [API Événements](#api-événements)
+## Installation et Configuration
+
+### PrÃ©requis
+
+Avant de lancer les containers Docker, vous devez configurer les variables d'environnement nÃ©cessaires pour Strapi et l'application web.
+
+#### 1. Configuration de Strapi
+
+**CrÃ©er un compte Cloudinary:**
+- Rendez-vous sur [https://cloudinary.com](https://cloudinary.com) et crÃ©ez un compte gratuit
+- RÃ©cupÃ©rez vos identifiants : Cloud Name, API Key et API Secret
+
+**Configurer le fichier `.env` pour Strapi:**
+- Copiez le fichier `.env.example` vers `.env` dans le dossier `strapi/`
+- Ajoutez vos identifiants Cloudinary dans les variables d'environnement correspondantes
+
+#### 2. Configuration de l'application Web
+
+**CrÃ©er un compte Stripe:**
+- Rendez-vous sur [https://stripe.com](https://stripe.com) et crÃ©ez un compte
+- RÃ©cupÃ©rez votre clÃ© publique (Publishable Key) depuis le dashboard Stripe
+
+**Configurer le fichier `.env` pour Web:**
+- Copiez le fichier `.env.example` vers `.env` dans le dossier `web/`
+- Ajoutez votre clÃ© publique Stripe dans les variables d'environnement correspondantes
+
+#### 3. Lancer les containers
+
+Une fois la configuration terminÃ©e, lancez tous les containers requis avec Docker Compose :
+
+```bash
+docker compose up -d
+```
+
+Cette commande va dÃ©marrer tous les services nÃ©cessaires (base de donnÃ©es, Strapi, etc.) en arriÃ¨re-plan.
+
+---
+
+## Table des matiÃ¨res
+1. [API Ã‰vÃ©nements](#api-Ã©vÃ©nements)
 2. [API Likes](#api-likes)
 3. [API Tickets](#api-tickets)
-4. [API Réservations](#api-réservations)
+4. [API RÃ©servations](#api-rÃ©servations)
 5. [Authentification](#authentification)
 
 ---
 
-## API Événements
+## API Ã‰vÃ©nements
 
-### 1. Récupérer les événements à découvrir
+### 1. RÃ©cupÃ©rer les Ã©vÃ©nements Ã  dÃ©couvrir
 **Route:** `GET /events/discover`
 
 **Query Parameters:**
@@ -22,7 +60,7 @@
 }
 ```
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
 Array<{
   id: string,
@@ -37,8 +75,8 @@ Array<{
       longitude: number
     }
   },
-  isSoldOut: boolean,         // Indique si l'événement est complet
-  startAt: string,            // Date de début
+  isSoldOut: boolean,         // Indique si l'Ã©vÃ©nement est complet
+  startAt: string,            // Date de dÃ©but (format ISO 8601)
   lowestPrice: number,        // Prix le plus bas en centimes
   description: string
 }>
@@ -46,13 +84,13 @@ Array<{
 
 ---
 
-### 2. Récupérer un événement par son ID
+### 2. RÃ©cupÃ©rer un Ã©vÃ©nement par son ID
 **Route:** `GET /events/:id`
 
-**Paramètres URL:**
-- `id`: Identifiant de l'événement
+**ParamÃ¨tres URL:**
+- `id`: Identifiant de l'Ã©vÃ©nement
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
 {
   id: string,
@@ -76,24 +114,24 @@ Array<{
 
 ---
 
-### 3. Récupérer plusieurs événements par leurs IDs
+### 3. RÃ©cupÃ©rer plusieurs Ã©vÃ©nements par leurs IDs
 **Route:** `GET /events`
 
 **Query Parameters:**
 ```typescript
 {
-  ids: string  // Liste d'IDs séparés par des virgules (ex: "id1,id2,id3")
+  ids: string  // Liste d'IDs sÃ©parÃ©s par des virgules (ex: "id1,id2,id3")
 }
 ```
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
-Array<Event>  // Même structure qu'un événement unique
+Array<Event>  // MÃªme structure qu'un Ã©vÃ©nement unique
 ```
 
 ---
 
-### 4. Rechercher des événements
+### 4. Rechercher des Ã©vÃ©nements
 **Route:** `GET /events/search`
 
 **Query Parameters:**
@@ -101,19 +139,19 @@ Array<Event>  // Même structure qu'un événement unique
 {
   lat: number,      // Latitude de recherche
   lng: number,      // Longitude de recherche
-  radius: number,   // Rayon de recherche en kilomètres
+  radius: number,   // Rayon de recherche en kilomÃ¨tres
   query: string     // Terme de recherche
 }
 ```
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
-Array<Event>  // Liste d'événements correspondants
+Array<Event>  // Liste d'Ã©vÃ©nements correspondants
 ```
 
 ---
 
-### 5. Récupérer les événements likés par l'utilisateur
+### 5. RÃ©cupÃ©rer les Ã©vÃ©nements likÃ©s par l'utilisateur
 **Route:** `GET /events/liked`
 
 **Headers requis:**
@@ -121,75 +159,75 @@ Array<Event>  // Liste d'événements correspondants
 Authorization: Bearer <token>
 ```
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
-Array<Event>  // Liste des événements likés
+Array<Event>  // Liste des Ã©vÃ©nements likÃ©s
 ```
 
 ---
 
 ## API Likes
 
-### 1. Liker un événement
+### 1. Liker un Ã©vÃ©nement
 **Route:** `POST /events/:eventId/like`
 
-**Paramètres URL:**
-- `eventId`: Identifiant de l'événement
+**ParamÃ¨tres URL:**
+- `eventId`: Identifiant de l'Ã©vÃ©nement
 
 **Headers requis:**
 ```
 Authorization: Bearer <token>
 ```
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
-void  // Pas de corps de réponse
+void  // Pas de corps de rÃ©ponse
 ```
 
 ---
 
-### 2. Unliker un événement
+### 2. Unliker un Ã©vÃ©nement
 **Route:** `DELETE /events/:eventId/like`
 
-**Paramètres URL:**
-- `eventId`: Identifiant de l'événement
+**ParamÃ¨tres URL:**
+- `eventId`: Identifiant de l'Ã©vÃ©nement
 
 **Headers requis:**
 ```
 Authorization: Bearer <token>
 ```
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
-void  // Pas de corps de réponse
+void  // Pas de corps de rÃ©ponse
 ```
 
 ---
 
 ## API Tickets
 
-### 1. Récupérer les tickets d'un événement
+### 1. RÃ©cupÃ©rer les tickets d'un Ã©vÃ©nement
 **Route:** `GET /events/:eventId/tickets`
 
-**Paramètres URL:**
-- `eventId`: Identifiant de l'événement
+**ParamÃ¨tres URL:**
+- `eventId`: Identifiant de l'Ã©vÃ©nement
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
 Array<{
   id: string,
   eventId: string,
   name: string,      // Nom du type de ticket (ex: "Early Bird", "VIP")
   price: number,     // Prix en centimes
-  quantity: number   // Quantité disponible
+  quantity: number   // QuantitÃ© disponible
 }>
 ```
 
 ---
 
-## API Réservations
+## API RÃ©servations
 
-### 1. Créer une réservation
+### 1. CrÃ©er une rÃ©servation
 **Route:** `POST /bookings`
 
 **Headers requis:**
@@ -197,42 +235,42 @@ Array<{
 Authorization: Bearer <token>
 ```
 
-**Corps de la requête:**
+**Corps de la requÃªte:**
 ```typescript
 {
   items: Array<{
     id: string,        // ID du ticket
-    quantity: number   // Quantité à réserver
+    quantity: number   // QuantitÃ© Ã  rÃ©server
   }>
 }
 ```
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
 {
-  id: string  // ID de la réservation créée
+  id: string  // ID de la rÃ©servation crÃ©Ã©e
 }
 ```
 
 ---
 
-### 2. Récupérer une réservation par son ID
+### 2. RÃ©cupÃ©rer une rÃ©servation par son ID
 **Route:** `GET /bookings/:id`
 
-**Paramètres URL:**
-- `id`: Identifiant de la réservation
+**ParamÃ¨tres URL:**
+- `id`: Identifiant de la rÃ©servation
 
 **Headers requis:**
 ```
 Authorization: Bearer <token>
 ```
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
 {
   id: string,
   eventId: string,
-  bookedAt: string,           // Date de réservation
+  bookedAt: string,           // Date de rÃ©servation (format ISO 8601)
   lines: Array<{
     id: string,
     name: string,             // Nom du ticket
@@ -246,12 +284,12 @@ Authorization: Bearer <token>
 }
 ```
 
-**Réponse:** `404 Not Found`
-Si la réservation n'existe pas.
+**RÃ©ponse:** `404 Not Found`
+Si la rÃ©servation n'existe pas.
 
 ---
 
-### 3. Récupérer toutes les réservations de l'utilisateur
+### 3. RÃ©cupÃ©rer toutes les rÃ©servations de l'utilisateur
 **Route:** `GET /bookings/user`
 
 **Headers requis:**
@@ -259,14 +297,14 @@ Si la réservation n'existe pas.
 Authorization: Bearer <token>
 ```
 
-**Réponse:** `200 OK`
+**RÃ©ponse:** `200 OK`
 ```typescript
-Array<Booking>  // Liste de réservations (même structure que ci-dessus)
+Array<Booking>  // Liste de rÃ©servations (mÃªme structure que ci-dessus)
 ```
 
 ---
 
-### 4. Stream des mises à jour de réservation (SSE)
+### 4. Stream des mises Ã  jour de rÃ©servation (SSE)
 **Route:** `GET /bookings/stream`
 
 **Headers requis:**
@@ -276,9 +314,9 @@ Authorization: Bearer <token>
 
 **Type:** Server-Sent Events (SSE)
 
-**Événements envoyés:**
+**Ã‰vÃ©nements envoyÃ©s:**
 
-**Événement:** `booking_updated`
+**Ã‰vÃ©nement:** `booking_updated`
 ```typescript
 {
   id: string,
@@ -297,27 +335,29 @@ Authorization: Bearer <token>
 }
 ```
 
-**Note:** Ce endpoint utilise Server-Sent Events (SSE) pour envoyer en temps réel les mises à jour de statut des réservations à l'utilisateur connecté.
+**Note:** Ce endpoint utilise Server-Sent Events (SSE) pour envoyer en temps rÃ©el les mises Ã  jour de statut des rÃ©servations Ã  l'utilisateur connectÃ©.
 
 ---
 
 ## Authentification
 
-Tous les endpoints marqués avec "Headers requis" nécessitent un token d'authentification JWT dans le header `Authorization`.
+Tous les endpoints marquÃ©s avec "Headers requis" nÃ©cessitent un token d'authentification JWT dans le header `Authorization`.
 
 **Format du header:**
 ```
 Authorization: Bearer <votre_token_jwt>
 ```
 
+Le token doit Ãªtre obtenu via votre systÃ¨me d'authentification (ex: Keycloak).
+
 ---
 
 ## Notes importantes
 
-### Statuts de réservation
-1. **requested** : Réservation demandée
-2. **reserved** : Tickets réservés temporairement
-3. **rejected** : Réservation refusée (manque de disponibilité)
+### Statuts de rÃ©servation
+1. **requested** : RÃ©servation demandÃ©e
+2. **reserved** : Tickets rÃ©servÃ©s temporairement
+3. **rejected** : RÃ©servation refusÃ©e (manque de disponibilitÃ©)
 4. **awaiting-payment** : En attente de paiement
-5. **expired** : Réservation expirée
-6. **confirmed** : Réservation confirmée après paiement
+5. **expired** : RÃ©servation expirÃ©e
+6. **confirmed** : RÃ©servation confirmÃ©e aprÃ¨s paiement
