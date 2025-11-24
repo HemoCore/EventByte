@@ -51,9 +51,9 @@ services:
       - ./docker/init-databases.sql:/docker-entrypoint-initdb.d/init.sql
 
   strapi:
-    build: ./strapi
+    build: ./frontend/strapi
     env_file:
-      - ./strapi/.env
+      - ./frontend/strapi/.env
     ports:
       - "1337:1337"
     depends_on:
@@ -82,11 +82,11 @@ services:
       - rabbitmq-data:/var/lib/rabbitmq
 
   web:
-    build: ./web
+    build: ./frontend/web
     ports:
       - "5173:5173"
     volumes:
-      - ./web/.env:/app/.env
+      - ./frontend/web/.env:/app/.env
     command: pnpm dev --host
 
 volumes:
