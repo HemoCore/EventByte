@@ -361,3 +361,84 @@ Le token doit être obtenu via votre système d'authentification (ex: Keycloak).
 4. **awaiting-payment** : En attente de paiement
 5. **expired** : Réservation expirée
 6. **confirmed** : Réservation confirmée après paiement
+
+---
+
+# Backend
+
+## Configuration dependencies
+
+```gradle
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    implementation 'com.meilisearch.sdk:meilisearch-java:0.12.0'
+}
+```
+
+## application.yml
+
+```yaml
+spring:
+  application:
+    name: eventbyte
+  datasource:
+    url: jdbc:postgresql://localhost:5432/eventbyte
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/eventbyte
+
+meilisearch:
+  host: http://localhost:7700
+  api-key: Cd9_wZ5drjqixClHEnbof-4h0bgktUzXwaY3yt8wJoM
+
+```
+
+## Security
+
+```java
+package fr.soft_labs.eventbyte.shared.infrastructure.security;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
+                }));
+
+        return http.build();
+    }
+}
