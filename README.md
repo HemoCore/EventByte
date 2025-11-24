@@ -16,6 +16,10 @@ Avant de lancer les containers Docker, vous devez configurer les variables d'env
 - Copiez le fichier `.env.example` vers `.env` dans le dossier `strapi/`
 - Ajoutez vos identifiants Cloudinary dans les variables d'environnement correspondantes
 
+**Ajouter une image** avant de run le seeding via le CLI
+- Rendez-vous sur [http://localhost:1337/admin/plugins/upload](http://localhost:1337/admin/plugins/upload)
+- Cliquer sur `Add new assets`
+
 #### 2. Configuration de l'application Web
 
 **Créer un compte Stripe:**
@@ -35,6 +39,12 @@ docker compose up -d
 ```
 
 Cette commande va démarrer tous les services nécessaires (base de données, Strapi, etc.) en arrière-plan.
+
+---
+
+# Connections aux services
+
+Pour Keycloak et RabbitMQ, l'identifiant et le mot de passe sont `admin`.
 
 ---
 
