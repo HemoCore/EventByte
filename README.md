@@ -42,6 +42,40 @@ Cette commande va démarrer tous les services nécessaires (base de données, St
 
 ---
 
+# Strapi
+
+Strapi envoie sur RabbitMQ dans l'exchange events les messages suivants: 
+
+- `event.created`
+- `event.updated`
+- `event.deleted`
+
+et tout les messages on comme data l'Event :
+
+```ts
+type Event = {
+    id: string;
+    title: string;
+    description: string;
+    cover: string;
+    venue: {
+        name: string;
+        address: string;
+        latitude: number;
+        longitude: number;
+    },
+    tickets: {
+        id: string;
+        name: string;
+        quantity: number;
+        price: number;
+    }[]
+}
+```
+
+
+---
+
 # Connections aux services
 
 Pour Keycloak et RabbitMQ, l'identifiant et le mot de passe sont `admin`.
