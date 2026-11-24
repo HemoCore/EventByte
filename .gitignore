@@ -1,2 +1,4 @@
 .eventbyte/
 frontend/web/.env
+.DS_Store
+.idea/

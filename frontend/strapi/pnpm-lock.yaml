@@ -15,7 +15,7 @@ importers:
         specifier: 5.29.0
         version: 5.29.0(092319691d7d2047517dab8b7018b197)
       '@strapi/provider-upload-cloudinary':
-        specifier: ^5.29.0
+        specifier: 5.29.0
         version: 5.29.0
       '@strapi/strapi':
         specifier: 5.29.0
