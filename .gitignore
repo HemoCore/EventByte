@@ -2,3 +2,6 @@
 frontend/web/.env
 .DS_Store
 .idea/
+
+# Token du CLI eventbyte
+.eventbyte/
