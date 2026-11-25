@@ -21,7 +21,7 @@ public class JpaEventRepository implements EventRepository {
     // L'outil de Spring Data qui parle vraiment à la base
     private final SpringDataEventRepository springData;
 
-    public JpaEventRepository(SpringDataEventRepository springData) {
+    JpaEventRepository(SpringDataEventRepository springData) {
         this.springData = springData;
     }
 
