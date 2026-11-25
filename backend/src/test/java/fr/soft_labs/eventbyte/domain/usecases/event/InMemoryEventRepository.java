@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-class InMemoryEventRepository implements EventRepository {
+public class InMemoryEventRepository implements EventRepository {
 
     private final Map<String, Event> events = new HashMap<>();
 
@@ -26,7 +26,7 @@ class InMemoryEventRepository implements EventRepository {
         events.remove(id);
     }
 
-    int count() {
+    public int count() {
         return events.size();
     }
 }
