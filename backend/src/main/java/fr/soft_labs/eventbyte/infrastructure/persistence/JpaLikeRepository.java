@@ -5,6 +5,8 @@ import fr.soft_labs.eventbyte.domain.ports.like.LikeRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Component
 public class JpaLikeRepository implements LikeRepository {
 
@@ -36,5 +38,14 @@ public class JpaLikeRepository implements LikeRepository {
     @Transactional(readOnly = true)
     public long countByEventId(String eventId) {
         return springData.countByIdEventId(eventId);
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> findEventIdsLikedBy(UserId userId) {
+        return springData.findByIdUserIdOrderByCreatedAtDesc(userId.value()).stream()
+                .map(like -> like.getId().getEventId())
+                .toList();
     }
 }

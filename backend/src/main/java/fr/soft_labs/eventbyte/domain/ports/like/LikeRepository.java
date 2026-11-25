@@ -2,6 +2,8 @@ package fr.soft_labs.eventbyte.domain.ports.like;
 
 import fr.soft_labs.eventbyte.domain.models.user.UserId;
 
+import java.util.List;
+
 public interface LikeRepository {
     boolean isLiked(UserId userId, String eventId);
 
@@ -12,4 +14,7 @@ public interface LikeRepository {
     void unlike(UserId userId, String eventId);
 
     long countByEventId(String eventId);
+
+    /** Les identifiants des événements likés par l'utilisateur, du plus récent au plus ancien. */
+    List<String> findEventIdsLikedBy(UserId userId);
 }

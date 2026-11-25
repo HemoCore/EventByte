@@ -3,15 +3,14 @@ package fr.soft_labs.eventbyte.domain.usecases.like;
 import fr.soft_labs.eventbyte.domain.models.user.UserId;
 import fr.soft_labs.eventbyte.domain.ports.like.LikeRepository;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-class InMemoryLikeRepository implements LikeRepository {
+public class InMemoryLikeRepository implements LikeRepository {
 
     private record LikeKey(UserId userId, String eventId) {
     }
 
-    private final Set<LikeKey> likes = new HashSet<>();
+    private final Set<LikeKey> likes = new LinkedHashSet<>();
 
     @Override
     public boolean isLiked(UserId userId, String eventId) {
@@ -31,5 +30,16 @@ class InMemoryLikeRepository implements LikeRepository {
     @Override
     public long countByEventId(String eventId) {
         return likes.stream().filter(like -> like.eventId().equals(eventId)).count();
+    }
+
+
+    @Override
+    public List<String> findEventIdsLikedBy(UserId userId) {
+        List<String> eventIds = new ArrayList<>(likes.stream()
+                .filter(like -> like.userId().equals(userId))
+                .map(LikeKey::eventId)
+                .toList());
+        Collections.reverse(eventIds);
+        return eventIds;
     }
 }

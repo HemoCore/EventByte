@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 interface SpringDataLikeRepository extends JpaRepository<LikeEntity, LikeId> {
 
     long countByIdEventId(String eventId);
@@ -13,4 +15,6 @@ interface SpringDataLikeRepository extends JpaRepository<LikeEntity, LikeId> {
     @Query(value = "INSERT INTO likes (user_id, event_id) VALUES (:userId, :eventId) ON CONFLICT DO NOTHING",
             nativeQuery = true)
     void insertIfAbsent(@Param("userId") String userId, @Param("eventId") String eventId);
+
+    List<LikeEntity> findByIdUserIdOrderByCreatedAtDesc(String userId);
 }
