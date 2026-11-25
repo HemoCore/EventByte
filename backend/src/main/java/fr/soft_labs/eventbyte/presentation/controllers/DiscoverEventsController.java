@@ -20,7 +20,6 @@ public class DiscoverEventsController {
         this.discoverEvents = discoverEvents;
     }
 
-    // US-4 : événements à venir près de la position envoyée par le front
     @GetMapping("/events/discover")
     public List<EventResponse> discover(@RequestParam double lat, @RequestParam double lng) {
         return discoverEvents.execute(new Coordinates(lat, lng)).stream()
@@ -28,7 +27,6 @@ public class DiscoverEventsController {
                 .toList();
     }
 
-    // Latitude ou longitude hors limites : erreur du client, pas du serveur
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<Void> badCoordinates() {
         return ResponseEntity.badRequest().build();

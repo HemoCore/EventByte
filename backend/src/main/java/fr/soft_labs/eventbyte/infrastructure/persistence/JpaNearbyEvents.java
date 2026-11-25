@@ -23,7 +23,6 @@ public class JpaNearbyEvents implements NearbyEvents {
     @Override
     @Transactional(readOnly = true)
     public List<Event> findUpcomingAround(Coordinates center, double radiusKm, Instant now, int limit) {
-        // Taille du rectangle en degrés : un degré de longitude rétrécit vers les pôles
         double latDelta = radiusKm / KM_PER_DEGREE_OF_LATITUDE;
         double lngDelta = radiusKm / (KM_PER_DEGREE_OF_LATITUDE
                 * Math.max(Math.cos(Math.toRadians(center.latitude())), 0.01));

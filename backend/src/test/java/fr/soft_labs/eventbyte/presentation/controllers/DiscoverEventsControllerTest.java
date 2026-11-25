@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** Vérifie la route et le format JSON du README pour /events/discover. */
 class DiscoverEventsControllerTest {
 
     private final Event event = anEvent()

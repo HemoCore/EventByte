@@ -29,7 +29,6 @@ class DiscoverEventsTest {
     private static final Venue IN_VERSAILLES = new Venue("Château", "Place d'Armes, Versailles", 48.8049, 2.1204);
     private static final Venue IN_LYON = new Venue("Halle Tony Garnier", "20 Pl. Docteurs, Lyon", 45.7319, 4.8188);
 
-    /** Faux adapter : applique la même règle que la requête SQL, en mémoire. */
     private static class InMemoryNearbyEvents implements NearbyEvents {
         final List<Event> events = new ArrayList<>();
 

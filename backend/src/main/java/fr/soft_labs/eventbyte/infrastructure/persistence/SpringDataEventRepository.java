@@ -9,8 +9,6 @@ import java.util.List;
 
 interface SpringDataEventRepository extends JpaRepository<EventEntity, String> {
 
-    // US-4 : un rectangle autour du centre élimine vite les lieux trop loin,
-    // puis la formule de haversine garde ceux qui sont vraiment dans le cercle.
     @Query(value = """
             SELECT * FROM events e
             WHERE e.venue_latitude BETWEEN :minLat AND :maxLat

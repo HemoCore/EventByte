@@ -8,11 +8,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Adapter provisoire : le stock disponible est la quantité envoyée par Strapi.
- * À remplacer par l'adapter Redis des réservations (US-11 / US-13),
- * qui déduira les réservations en cours.
- */
 @Component
 public class InitialStockTicketAvailability implements TicketAvailability {
 

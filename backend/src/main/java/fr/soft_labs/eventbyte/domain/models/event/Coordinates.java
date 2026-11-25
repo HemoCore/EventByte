@@ -1,6 +1,5 @@
 package fr.soft_labs.eventbyte.domain.models.event;
 
-/** Une position GPS (latitude, longitude en degrés). */
 public record Coordinates(double latitude, double longitude) {
 
     private static final double EARTH_RADIUS_KM = 6371.0;
@@ -14,7 +13,6 @@ public record Coordinates(double latitude, double longitude) {
         }
     }
 
-    /** Distance à vol d'oiseau en kilomètres (formule de haversine). */
     public double distanceKmTo(Coordinates other) {
         double dLat = Math.toRadians(other.latitude - latitude);
         double dLng = Math.toRadians(other.longitude - longitude);

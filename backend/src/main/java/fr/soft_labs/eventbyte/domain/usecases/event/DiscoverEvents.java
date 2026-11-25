@@ -7,10 +7,6 @@ import fr.soft_labs.eventbyte.domain.ports.event.NearbyEvents;
 import java.time.Clock;
 import java.util.List;
 
-/**
- * US-4 : découvrir les événements près de soi.
- * Choix du groupe : événements à venir à moins de 50 km, triés par date, 50 au maximum.
- */
 public class DiscoverEvents {
 
     public static final double RADIUS_KM = 50;

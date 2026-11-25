@@ -219,7 +219,6 @@ SELECT pg_catalog.setval('strapi.outbox_events_id_seq', 10, true);
 -- L'auteur admin n'existe pas forcément chez l'autre personne
 UPDATE strapi.events SET created_by_id = NULL, updated_by_id = NULL;
 UPDATE strapi.files  SET created_by_id = NULL, updated_by_id = NULL;
--- Ajoute la date de début (startAt) aux messages exportés avant ce champ
 UPDATE strapi.outbox_events o
 SET payload = (o.payload::jsonb || jsonb_build_object(
         'startAt', to_char(e.start_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')))::json
