@@ -14,6 +14,7 @@ public class RabbitMqConfig {
     public static final String EVENTS_EXCHANGE = "events";
     public static final String EVENTS_QUEUE = "eventbyte.backend.events";
     public static final String EVENTS_ROUTING_KEY = "event.*";
+    public static final String BOOKINGS_QUEUE = "eventbyte.backend.bookings";
 
     @Bean
     TopicExchange eventsExchange() {
@@ -28,5 +29,11 @@ public class RabbitMqConfig {
     @Bean
     Binding eventsBinding(Queue eventsQueue, TopicExchange eventsExchange) {
         return BindingBuilder.bind(eventsQueue).to(eventsExchange).with(EVENTS_ROUTING_KEY);
+    }
+
+    // Booking requests: sent by the backend to itself through the default exchange (routing key = queue name)
+    @Bean
+    Queue bookingsQueue() {
+        return QueueBuilder.durable(BOOKINGS_QUEUE).build();
     }
 }
