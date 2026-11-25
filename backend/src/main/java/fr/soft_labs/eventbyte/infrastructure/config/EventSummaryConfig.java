@@ -6,7 +6,6 @@ import fr.soft_labs.eventbyte.domain.usecases.event.EventSummaryAssembler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** Brique partagée par toutes les routes qui renvoient des événements (US-4 à US-7). */
 @Configuration
 public class EventSummaryConfig {
 

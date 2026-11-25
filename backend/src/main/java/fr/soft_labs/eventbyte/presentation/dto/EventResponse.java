@@ -7,7 +7,6 @@ import fr.soft_labs.eventbyte.domain.models.event.Venue;
 
 import java.time.Instant;
 
-/** Format d'un événement exposé par l'API, tel que défini dans le README. */
 public record EventResponse(
         String id,
         String title,

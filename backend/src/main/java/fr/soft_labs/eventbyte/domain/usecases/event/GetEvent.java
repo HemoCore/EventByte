@@ -5,7 +5,6 @@ import fr.soft_labs.eventbyte.domain.ports.event.EventRepository;
 
 import java.util.Optional;
 
-/** US-5 : consulter le détail d'un événement. */
 public class GetEvent {
 
     private final EventRepository eventRepository;

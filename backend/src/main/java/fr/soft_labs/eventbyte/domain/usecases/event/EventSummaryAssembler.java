@@ -9,10 +9,6 @@ import fr.soft_labs.eventbyte.domain.ports.event.TicketAvailability;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Ajoute aux événements les informations calculées (likes, complet).
- * Partagé par tous les cas d'usage qui renvoient des événements au public.
- */
 public class EventSummaryAssembler {
 
     private final LikeCounter likeCounter;
@@ -27,7 +23,6 @@ public class EventSummaryAssembler {
         if (events.isEmpty()) {
             return List.of();
         }
-        // Un seul appel pour tous les likes et un seul pour tout le stock
         Map<String, Long> likes = likeCounter.countByEventIds(events.stream().map(Event::id).toList());
         Map<String, Integer> available = ticketAvailability.availableByTicketId(
                 events.stream().flatMap(event -> event.tickets().stream()).toList());
@@ -44,7 +39,6 @@ public class EventSummaryAssembler {
         return assemble(List.of(event)).getFirst();
     }
 
-    // Complet quand plus aucun ticket n'est disponible (ou qu'il n'y a aucun ticket)
     private static boolean isSoldOut(Event event, Map<String, Integer> available) {
         return event.tickets().stream()
                 .map(Ticket::id)

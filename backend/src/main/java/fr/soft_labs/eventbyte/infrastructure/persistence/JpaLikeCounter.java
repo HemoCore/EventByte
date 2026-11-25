@@ -10,10 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Compte les likes de plusieurs événements en une seule requête (GROUP BY),
- * pour éviter une requête par événement sur les listes (discover, recherche, favoris).
- */
 @Component
 public class JpaLikeCounter implements LikeCounter {
 

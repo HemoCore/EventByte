@@ -11,10 +11,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Test d'intégration sur la base Postgres de docker compose.
- * Chaque test est annulé à la fin (@Transactional) : aucune donnée ne reste en base.
- */
 @SpringBootTest
 @Transactional
 class JpaLikeCounterTest {
@@ -42,7 +38,6 @@ class JpaLikeCounterTest {
         var counts = likeCounter.countByEventIds(List.of("evt_test_a", "evt_test_b", "evt_test_c"));
 
         assertThat(counts).containsEntry("evt_test_a", 3L).containsEntry("evt_test_b", 1L);
-        // Un événement sans like n'est pas dans la map : il compte pour 0
         assertThat(counts).doesNotContainKey("evt_test_c");
     }
 

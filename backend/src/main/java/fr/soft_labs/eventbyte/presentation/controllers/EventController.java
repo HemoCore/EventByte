@@ -18,7 +18,6 @@ public class EventController {
         this.getEvent = getEvent;
     }
 
-    // US-5 : détail d'un événement, 404 s'il n'existe pas
     @GetMapping("/{id}")
     public ResponseEntity<EventResponse> getById(@PathVariable String id) {
         return getEvent.execute(id)

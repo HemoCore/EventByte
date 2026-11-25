@@ -19,7 +19,6 @@ class GetEventTest {
     private final Map<String, Long> likes = new HashMap<>();
     private final Map<String, Integer> stockOverrides = new HashMap<>();
 
-    // Stock = quantité du ticket, sauf si le test en impose un autre
     private final TicketAvailability availability = tickets -> tickets.stream()
             .collect(Collectors.toMap(Ticket::id, t -> stockOverrides.getOrDefault(t.id(), t.quantity())));
 
@@ -72,7 +71,6 @@ class GetEventTest {
         repository.save(anEvent().withId("evt_1").withTickets(
                 new Ticket("tkt_1", "Standard", Money.ofCents(1000), 50),
                 new Ticket("tkt_2", "VIP", Money.ofCents(5000), 5)).build());
-        // Toutes les places sont prises par des réservations en cours
         stockOverrides.put("tkt_1", 0);
         stockOverrides.put("tkt_2", 0);
 
