@@ -8,5 +8,8 @@ public interface LikeRepository {
     /** Enregistre le like. Ne fait rien si l'utilisateur a déjà liké cet événement. */
     void like(UserId userId, String eventId);
 
+    /** Retire le like. Ne fait rien si l'utilisateur n'avait pas liké cet événement. */
+    void unlike(UserId userId, String eventId);
+
     long countByEventId(String eventId);
 }

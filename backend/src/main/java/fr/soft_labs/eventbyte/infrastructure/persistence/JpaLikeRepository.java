@@ -27,6 +27,12 @@ public class JpaLikeRepository implements LikeRepository {
     }
 
     @Override
+    @Transactional
+    public void unlike(UserId userId, String eventId) {
+        springData.deleteById(new LikeId(userId.value(), eventId));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public long countByEventId(String eventId) {
         return springData.countByIdEventId(eventId);
