@@ -3,6 +3,7 @@ package fr.soft_labs.eventbyte.presentation.controllers;
 import fr.soft_labs.eventbyte.domain.models.event.Event;
 import fr.soft_labs.eventbyte.domain.usecases.event.DiscoverEvents;
 import fr.soft_labs.eventbyte.domain.usecases.event.EventSummaryAssembler;
+import fr.soft_labs.eventbyte.presentation.errors.ApiExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -30,7 +31,9 @@ class DiscoverEventsControllerTest {
             Clock.systemUTC());
 
     private final MockMvc mockMvc = MockMvcBuilders
-            .standaloneSetup(new DiscoverEventsController(discoverEvents)).build();
+            .standaloneSetup(new DiscoverEventsController(discoverEvents))
+            .setControllerAdvice(new ApiExceptionHandler())
+            .build();
 
     @Test
     void returns_the_events_in_the_api_format() throws Exception {
@@ -54,6 +57,7 @@ class DiscoverEventsControllerTest {
     @Test
     void returns_400_when_the_position_is_invalid() throws Exception {
         mockMvc.perform(get("/events/discover").param("lat", "120").param("lng", "1.4"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Latitude invalide : 120.0"));
     }
 }
