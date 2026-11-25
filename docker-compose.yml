@@ -89,6 +89,24 @@ services:
       - ./frontend/web/.env:/app/.env
     command: pnpm dev --host
 
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/eventbyte
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: http://keycloak:8080/realms/eventbyte/protocol/openid-connect/certs
+      MEILISEARCH_HOST: http://meilisearch:7700
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+      - keycloak
+      - meilisearch
+    restart: on-failure
+
 volumes:
   keycloak_postgres_data:
   postgres_data:
