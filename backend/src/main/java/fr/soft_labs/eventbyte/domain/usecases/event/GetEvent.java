@@ -1,9 +1,8 @@
 package fr.soft_labs.eventbyte.domain.usecases.event;
 
+import fr.soft_labs.eventbyte.domain.models.event.EventNotFoundException;
 import fr.soft_labs.eventbyte.domain.models.event.EventSummary;
 import fr.soft_labs.eventbyte.domain.ports.event.EventRepository;
-
-import java.util.Optional;
 
 public class GetEvent {
 
@@ -15,7 +14,9 @@ public class GetEvent {
         this.assembler = assembler;
     }
 
-    public Optional<EventSummary> execute(String id) {
-        return eventRepository.findById(id).map(assembler::assemble);
+    public EventSummary execute(String id) {
+        return eventRepository.findById(id)
+                .map(assembler::assemble)
+                .orElseThrow(() -> new EventNotFoundException(id));
     }
 }

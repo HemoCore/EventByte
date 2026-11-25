@@ -1,10 +1,10 @@
 package fr.soft_labs.eventbyte.presentation.controllers;
 
 import fr.soft_labs.eventbyte.domain.models.event.Event;
-import fr.soft_labs.eventbyte.domain.models.event.EventSummary;
 import fr.soft_labs.eventbyte.domain.ports.event.EventRepository;
 import fr.soft_labs.eventbyte.domain.usecases.event.EventSummaryAssembler;
 import fr.soft_labs.eventbyte.domain.usecases.event.GetEvent;
+import fr.soft_labs.eventbyte.presentation.errors.ApiExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -44,7 +44,10 @@ class EventControllerTest {
             new EventSummaryAssembler(ids -> Map.of("evt_1", 4L),
                     tickets -> Map.of("tkt_1", 21, "tkt_2", 78)));
 
-    private final MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new EventController(getEvent)).build();
+    private final MockMvc mockMvc = MockMvcBuilders
+            .standaloneSetup(new EventController(getEvent))
+            .setControllerAdvice(new ApiExceptionHandler())
+            .build();
 
     @Test
     void returns_the_event_in_the_api_format() throws Exception {
@@ -64,6 +67,7 @@ class EventControllerTest {
     @Test
     void returns_404_when_the_event_does_not_exist() throws Exception {
         mockMvc.perform(get("/events/unknown"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value("Event not found: unknown"));
     }
 }

@@ -1,5 +1,6 @@
 package fr.soft_labs.eventbyte.domain.usecases.event;
 
+import fr.soft_labs.eventbyte.domain.models.event.EventNotFoundException;
 import fr.soft_labs.eventbyte.domain.models.event.EventSummary;
 import fr.soft_labs.eventbyte.domain.models.event.Money;
 import fr.soft_labs.eventbyte.domain.models.event.Ticket;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 
 import static fr.soft_labs.eventbyte.domain.models.event.EventBuilder.anEvent;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class GetEventTest {
 
@@ -26,8 +28,10 @@ class GetEventTest {
             new EventSummaryAssembler(ids -> likes, availability));
 
     @Test
-    void returns_nothing_when_the_event_does_not_exist() {
-        assertThat(getEvent.execute("unknown")).isEmpty();
+    void fails_when_the_event_does_not_exist() {
+        assertThatThrownBy(() -> getEvent.execute("unknown"))
+                .isInstanceOf(EventNotFoundException.class)
+                .hasMessage("Event not found: unknown");
     }
 
     @Test
@@ -35,7 +39,7 @@ class GetEventTest {
         repository.save(anEvent().withId("evt_1").build());
         likes.put("evt_1", 3L);
 
-        EventSummary summary = getEvent.execute("evt_1").orElseThrow();
+        EventSummary summary = getEvent.execute("evt_1");
 
         assertThat(summary.event().id()).isEqualTo("evt_1");
         assertThat(summary.likedCount()).isEqualTo(3);
@@ -45,7 +49,7 @@ class GetEventTest {
     void an_event_without_likes_has_zero_likes() {
         repository.save(anEvent().withId("evt_1").build());
 
-        assertThat(getEvent.execute("evt_1").orElseThrow().likedCount()).isZero();
+        assertThat(getEvent.execute("evt_1").likedCount()).isZero();
     }
 
     @Test
@@ -54,7 +58,7 @@ class GetEventTest {
                 new Ticket("tkt_vip", "VIP", Money.ofCents(13477), 10),
                 new Ticket("tkt_std", "Standard", Money.ofCents(1541), 10)).build());
 
-        assertThat(getEvent.execute("evt_1").orElseThrow().lowestPrice()).isEqualTo(Money.ofCents(1541));
+        assertThat(getEvent.execute("evt_1").lowestPrice()).isEqualTo(Money.ofCents(1541));
     }
 
     @Test
@@ -63,7 +67,7 @@ class GetEventTest {
                 new Ticket("tkt_1", "Standard", Money.ofCents(1000), 0),
                 new Ticket("tkt_2", "VIP", Money.ofCents(5000), 2)).build());
 
-        assertThat(getEvent.execute("evt_1").orElseThrow().soldOut()).isFalse();
+        assertThat(getEvent.execute("evt_1").soldOut()).isFalse();
     }
 
     @Test
@@ -74,6 +78,6 @@ class GetEventTest {
         stockOverrides.put("tkt_1", 0);
         stockOverrides.put("tkt_2", 0);
 
-        assertThat(getEvent.execute("evt_1").orElseThrow().soldOut()).isTrue();
+        assertThat(getEvent.execute("evt_1").soldOut()).isTrue();
     }
 }
