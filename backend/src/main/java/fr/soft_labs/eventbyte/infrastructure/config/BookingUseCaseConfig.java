@@ -6,6 +6,8 @@ import fr.soft_labs.eventbyte.domain.ports.booking.StockReservation;
 import fr.soft_labs.eventbyte.domain.ports.booking.TicketCatalog;
 import fr.soft_labs.eventbyte.domain.ports.shared.IdGenerator;
 import fr.soft_labs.eventbyte.domain.usecases.booking.ExpireBookings;
+import fr.soft_labs.eventbyte.domain.usecases.booking.GetBooking;
+import fr.soft_labs.eventbyte.domain.usecases.booking.GetUserBookings;
 import fr.soft_labs.eventbyte.domain.usecases.booking.ProcessBookingRequest;
 import fr.soft_labs.eventbyte.domain.usecases.booking.RequestBooking;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +33,16 @@ public class BookingUseCaseConfig {
                                                 TicketCatalog ticketCatalog,
                                                 StockReservation stockReservation) {
         return new ProcessBookingRequest(bookingRepository, ticketCatalog, stockReservation);
+    }
+
+    @Bean
+    GetBooking getBooking(BookingRepository bookingRepository) {
+        return new GetBooking(bookingRepository);
+    }
+
+    @Bean
+    GetUserBookings getUserBookings(BookingRepository bookingRepository) {
+        return new GetUserBookings(bookingRepository);
     }
 
     @Bean

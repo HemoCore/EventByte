@@ -40,6 +40,14 @@ public class JpaBookingRepository implements BookingRepository {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Booking> findByUserId(UserId userId) {
+        return springData.findByUserIdOrderByBookedAtDesc(userId.value()).stream()
+                .map(JpaBookingRepository::toDomain)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Booking> findExpirable(Instant bookedBefore) {
         return springData.findByStatusInAndBookedAtBefore(Booking.EXPIRABLE_STATUSES, bookedBefore).stream()
                 .map(JpaBookingRepository::toDomain)

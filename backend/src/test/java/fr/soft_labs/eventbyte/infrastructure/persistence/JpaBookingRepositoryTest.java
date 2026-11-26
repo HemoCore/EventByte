@@ -77,6 +77,19 @@ class JpaBookingRepositoryTest {
     }
 
     @Test
+    void finds_the_bookings_of_a_user_most_recent_first() {
+        save("bkg_test_old", BookingStatus.EXPIRED, NOW.minus(Duration.ofDays(2)));
+        save("bkg_test_new", BookingStatus.RESERVED, NOW);
+        repository.save(new Booking("bkg_test_other", new UserId("user-2"), "evt_test_bkg", NOW,
+                List.of(new BookingLine("tkt_test", "VIP", 1, Money.ofCents(5000))), BookingStatus.RESERVED));
+
+        assertThat(repository.findByUserId(new UserId("user-1")))
+                .extracting(Booking::id)
+                .filteredOn(id -> id.startsWith("bkg_test_"))
+                .containsExactly("bkg_test_new", "bkg_test_old");
+    }
+
+    @Test
     void an_expired_booking_is_saved_with_its_new_status() {
         save("bkg_test_1", BookingStatus.RESERVED, NOW.minus(Duration.ofHours(1)));
         Booking booking = repository.findById("bkg_test_1").orElseThrow();
