@@ -29,8 +29,9 @@ spring:
 
 eventbyte:
   booking:
-    # US-14: an unpaid booking expires this long after it was made, and its seats go back on sale
-    expiration: 15m
+    # US-14: an unpaid booking expires this long after it was made, and its seats go back on sale.
+    # 10 min = the frontend payment timer (booking-timer.viewmodel.ts: EXPIRATION_DURATION = 10 minutes)
+    expiration: 10m
     # how often the expiration job runs
     expiration-check: 30s
 
