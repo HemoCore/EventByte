@@ -2,7 +2,7 @@ package fr.soft_labs.eventbyte.infrastructure.config;
 
 import fr.soft_labs.eventbyte.domain.ports.event.EventRepository;
 import fr.soft_labs.eventbyte.domain.ports.like.LikeRepository;
-import fr.soft_labs.eventbyte.domain.usecases.event.EventSummaryAssembler;
+import fr.soft_labs.eventbyte.domain.usecases.event.GetEventsByIds;
 import fr.soft_labs.eventbyte.domain.usecases.like.GetLikedEvents;
 import fr.soft_labs.eventbyte.domain.usecases.like.LikeEvent;
 import fr.soft_labs.eventbyte.domain.usecases.like.UnlikeEvent;
@@ -23,8 +23,7 @@ public class LikeUseCaseConfig {
     }
 
     @Bean
-    GetLikedEvents getLikedEvents(LikeRepository likeRepository, EventRepository eventRepository,
-                                  EventSummaryAssembler eventSummaryAssembler) {
-        return new GetLikedEvents(likeRepository, eventRepository, eventSummaryAssembler);
+    GetLikedEvents getLikedEvents(LikeRepository likeRepository, GetEventsByIds getEventsByIds) {
+        return new GetLikedEvents(likeRepository, getEventsByIds);
     }
 }
