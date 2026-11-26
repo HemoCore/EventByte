@@ -21,14 +21,16 @@ public class JpaBookingRepository implements BookingRepository {
         this.springData = springData;
     }
 
-    // Creates the booking, or updates its status if it already exists.
-    // Lines never change after creation, so only the status is updated.
+    // Creates the booking, or updates it if it already exists.
+    // Lines never change after creation: only the status and the payment (US-16) are updated.
     @Override
     @Transactional
     public void save(Booking booking) {
         BookingEntity entity = springData.findById(booking.id())
                 .orElseGet(() -> toEntity(booking));
         entity.setStatus(booking.status());
+        entity.setPaymentIntentId(booking.paymentIntentId());
+        entity.setClientSecret(booking.clientSecret());
         springData.save(entity);
     }
 
@@ -78,6 +80,8 @@ public class JpaBookingRepository implements BookingRepository {
                                 l.getTicketId(), l.getName(), l.getQuantity(),
                                 Money.ofCents(l.getUnitPriceCents())))
                         .toList(),
-                entity.getStatus());
+                entity.getStatus(),
+                entity.getPaymentIntentId(),
+                entity.getClientSecret());
     }
 }

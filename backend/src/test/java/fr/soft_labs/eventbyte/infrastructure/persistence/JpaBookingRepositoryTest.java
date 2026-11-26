@@ -3,6 +3,7 @@ package fr.soft_labs.eventbyte.infrastructure.persistence;
 import fr.soft_labs.eventbyte.domain.models.booking.Booking;
 import fr.soft_labs.eventbyte.domain.models.booking.BookingLine;
 import fr.soft_labs.eventbyte.domain.models.booking.BookingStatus;
+import fr.soft_labs.eventbyte.domain.models.booking.Payment;
 import fr.soft_labs.eventbyte.domain.models.event.Money;
 import fr.soft_labs.eventbyte.domain.models.user.UserId;
 import jakarta.persistence.EntityManager;
@@ -58,6 +59,34 @@ class JpaBookingRepositoryTest {
         assertThat(found.bookedAt()).isEqualTo(NOW);
         assertThat(found.lines()).singleElement()
                 .satisfies(l -> assertThat(l.quantity()).isEqualTo(2));
+    }
+
+    @Test
+    void saves_the_payment_of_a_booking_awaiting_payment() {
+        save("bkg_test_pay", BookingStatus.REQUESTED, NOW);
+        Booking booking = repository.findById("bkg_test_pay").orElseThrow();
+        booking.reserve();
+        booking.awaitPayment(new Payment("pi_test_1", "pi_test_1_secret_abc"));
+
+        repository.save(booking);
+        entityManager.flush();
+        entityManager.clear();
+
+        Booking found = repository.findById("bkg_test_pay").orElseThrow();
+        assertThat(found.status()).isEqualTo(BookingStatus.AWAITING_PAYMENT);
+        assertThat(found.paymentIntentId()).isEqualTo("pi_test_1");
+        assertThat(found.clientSecret()).isEqualTo("pi_test_1_secret_abc");
+    }
+
+    @Test
+    void a_booking_without_payment_has_no_payment_columns() {
+        save("bkg_test_nopay", BookingStatus.RESERVED, NOW);
+        entityManager.flush();
+        entityManager.clear();
+
+        Booking found = repository.findById("bkg_test_nopay").orElseThrow();
+        assertThat(found.paymentIntentId()).isNull();
+        assertThat(found.clientSecret()).isNull();
     }
 
     @Test

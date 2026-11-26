@@ -22,7 +22,9 @@ class ProcessBookingRequestTest {
     private final InMemoryBookingRepository repository = new InMemoryBookingRepository();
     private final InMemoryStockReservation stock = new InMemoryStockReservation();
 
-    private final ProcessBookingRequest process = new ProcessBookingRequest(repository, catalog, stock);
+    private final FakePaymentGateway payments = new FakePaymentGateway();
+
+    private final ProcessBookingRequest process = new ProcessBookingRequest(repository, catalog, stock, payments);
 
     private void givenBooking(String id, int quantity) {
         repository.save(Booking.request(id, new UserId("user-1"), "evt_1", NOW,
@@ -34,12 +36,12 @@ class ProcessBookingRequestTest {
     }
 
     @Test
-    void reserves_when_stock_is_enough() {
+    void reserves_when_stock_is_enough_then_awaits_payment() {
         givenBooking("bkg_1", 2);
 
         process.execute("bkg_1");
 
-        assertThat(statusOf("bkg_1")).isEqualTo(BookingStatus.RESERVED);
+        assertThat(statusOf("bkg_1")).isEqualTo(BookingStatus.AWAITING_PAYMENT);
         assertThat(stock.stock.get("tkt_vip")).isEqualTo(1);
     }
 
@@ -61,7 +63,7 @@ class ProcessBookingRequestTest {
         process.execute("bkg_1");
         process.execute("bkg_2");
 
-        assertThat(statusOf("bkg_1")).isEqualTo(BookingStatus.RESERVED);
+        assertThat(statusOf("bkg_1")).isEqualTo(BookingStatus.AWAITING_PAYMENT);
         assertThat(statusOf("bkg_2")).isEqualTo(BookingStatus.REJECTED);
     }
 
@@ -81,5 +83,64 @@ class ProcessBookingRequestTest {
         process.execute("nope");
 
         assertThat(stock.calls).isZero();
+        assertThat(payments.calls).isEmpty();
+    }
+
+    // --- payment (US-16) ---
+
+    @Test
+    void a_reserved_booking_gets_its_payment_and_client_secret() {
+        givenBooking("bkg_1", 2);
+
+        process.execute("bkg_1");
+
+        Booking booking = repository.findById("bkg_1").orElseThrow();
+        assertThat(booking.status()).isEqualTo(BookingStatus.AWAITING_PAYMENT);
+        assertThat(booking.paymentIntentId()).isEqualTo("pi_bkg_1");
+        assertThat(booking.clientSecret()).isEqualTo("pi_bkg_1_secret_123");
+    }
+
+    @Test
+    void the_payment_is_asked_for_the_total_with_fees() {
+        givenBooking("bkg_1", 2);
+
+        process.execute("bkg_1");
+
+        // 2 x 5000 + 2 tickets x 30 cents of fees
+        assertThat(payments.calls).containsExactly(new FakePaymentGateway.Call("bkg_1", Money.ofCents(10060)));
+    }
+
+    @Test
+    void a_rejected_booking_asks_no_payment() {
+        givenBooking("bkg_1", 4);
+
+        process.execute("bkg_1");
+
+        assertThat(statusOf("bkg_1")).isEqualTo(BookingStatus.REJECTED);
+        assertThat(payments.calls).isEmpty();
+        assertThat(repository.findById("bkg_1").orElseThrow().clientSecret()).isNull();
+    }
+
+    @Test
+    void the_booking_stays_reserved_when_the_payment_cannot_be_created() {
+        payments.failing = true;
+        givenBooking("bkg_1", 2);
+
+        process.execute("bkg_1");
+
+        Booking booking = repository.findById("bkg_1").orElseThrow();
+        assertThat(booking.status()).isEqualTo(BookingStatus.RESERVED);
+        assertThat(booking.clientSecret()).isNull();
+        assertThat(stock.stock.get("tkt_vip")).isEqualTo(1); // still held: the US-14 job gives it back
+    }
+
+    @Test
+    void a_duplicate_message_does_not_ask_a_second_payment() {
+        givenBooking("bkg_1", 2);
+
+        process.execute("bkg_1");
+        process.execute("bkg_1");
+
+        assertThat(payments.calls).hasSize(1);
     }
 }

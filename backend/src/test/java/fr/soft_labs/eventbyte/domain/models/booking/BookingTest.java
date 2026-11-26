@@ -52,12 +52,78 @@ class BookingTest {
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
-    // --- total ---
+    // --- amounts (US-16) ---
 
     @Test
-    void total_is_the_sum_of_lines() {
+    void subtotal_is_the_sum_of_lines() {
         // 2 x 5000 + 1 x 1500 = 11500
-        assertThat(newBooking().total()).isEqualTo(Money.ofCents(11500));
+        assertThat(newBooking().subtotal()).isEqualTo(Money.ofCents(11500));
+    }
+
+    @Test
+    void fees_are_30_cents_per_ticket() {
+        // 2 + 1 = 3 tickets
+        assertThat(newBooking().fees()).isEqualTo(Money.ofCents(90));
+    }
+
+    @Test
+    void total_is_lines_plus_fees() {
+        assertThat(newBooking().total()).isEqualTo(Money.ofCents(11590));
+    }
+
+    // --- payment (US-16) ---
+
+    @Test
+    void a_reserved_booking_awaits_payment_with_the_client_secret() {
+        Booking booking = newBooking();
+        booking.reserve();
+
+        booking.awaitPayment(new Payment("pi_1", "pi_1_secret_abc"));
+
+        assertThat(booking.status()).isEqualTo(BookingStatus.AWAITING_PAYMENT);
+        assertThat(booking.paymentIntentId()).isEqualTo("pi_1");
+        assertThat(booking.clientSecret()).isEqualTo("pi_1_secret_abc");
+    }
+
+    @Test
+    void a_new_booking_has_no_payment_yet() {
+        assertThat(newBooking().paymentIntentId()).isNull();
+        assertThat(newBooking().clientSecret()).isNull();
+    }
+
+    @Test
+    void only_a_reserved_booking_can_await_payment() {
+        Payment payment = new Payment("pi_1", "pi_1_secret_abc");
+        for (BookingStatus status : List.of(BookingStatus.REQUESTED, BookingStatus.REJECTED,
+                BookingStatus.AWAITING_PAYMENT, BookingStatus.EXPIRED, BookingStatus.CONFIRMED)) {
+            Booking booking = new Booking("bkg_1", USER, "evt_1", NOW, LINES, status);
+            assertThatThrownBy(() -> booking.awaitPayment(payment)).isInstanceOf(IllegalStateException.class);
+        }
+    }
+
+    @Test
+    void awaiting_payment_needs_a_payment() {
+        Booking booking = newBooking();
+        booking.reserve();
+
+        assertThatThrownBy(() -> booking.awaitPayment(null)).isInstanceOf(InvalidBookingException.class);
+    }
+
+    @Test
+    void a_payment_needs_an_id_and_a_client_secret() {
+        assertThatThrownBy(() -> new Payment(" ", "secret")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Payment("pi_1", null)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void an_awaiting_payment_booking_still_expires() {
+        Booking booking = newBooking();
+        booking.reserve();
+        booking.awaitPayment(new Payment("pi_1", "pi_1_secret_abc"));
+
+        booking.expire();
+
+        assertThat(booking.status()).isEqualTo(BookingStatus.EXPIRED);
     }
 
     // --- status changes ---
