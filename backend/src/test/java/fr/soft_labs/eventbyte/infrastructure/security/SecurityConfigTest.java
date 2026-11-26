@@ -58,6 +58,22 @@ class SecurityConfigTest {
         String bookings() {
             return currentUser.get().value();
         }
+
+        @PostMapping("/webhooks/stripe")
+        String stripeWebhook() {
+            return "ok";
+        }
+    }
+
+    @Test
+    void the_stripe_webhook_needs_no_token() throws Exception {
+        // US-17: Stripe has no JWT; the controller checks the Stripe signature instead
+        mockMvc.perform(post("/webhooks/stripe")).andExpect(status().isOk());
+    }
+
+    @Test
+    void only_post_is_public_on_the_stripe_webhook() throws Exception {
+        mockMvc.perform(get("/webhooks/stripe")).andExpect(status().isUnauthorized());
     }
 
     @Test

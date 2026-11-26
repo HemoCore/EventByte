@@ -24,8 +24,10 @@ class ExpireBookingsTest {
     private final InMemoryBookingRepository repository = new InMemoryBookingRepository();
     private final InMemoryStockReservation stock = new InMemoryStockReservation();
 
+    private final FakePaymentGateway payments = new FakePaymentGateway();
+
     private final ExpireBookings expireBookings =
-            new ExpireBookings(repository, stock, Clock.fixed(NOW, ZoneOffset.UTC), DELAY);
+            new ExpireBookings(repository, stock, payments, Clock.fixed(NOW, ZoneOffset.UTC), DELAY);
 
     private void givenBooking(String id, BookingStatus status, Instant bookedAt, int vip, int early) {
         List<BookingLine> lines = new java.util.ArrayList<>();
@@ -126,7 +128,49 @@ class ExpireBookingsTest {
 
     @Test
     void the_delay_must_be_positive() {
-        assertThatThrownBy(() -> new ExpireBookings(repository, stock, Clock.systemUTC(), Duration.ZERO))
+        assertThatThrownBy(() -> new ExpireBookings(repository, stock, payments, Clock.systemUTC(), Duration.ZERO))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    // --- payment cancelled on expiry (US-17) ---
+
+    private void givenAwaitingPayment(String id, String paymentId) {
+        repository.save(new Booking(id, new UserId("user-1"), "evt_1", NOW.minus(Duration.ofHours(1)),
+                List.of(new BookingLine("tkt_vip", "VIP", 1, Money.ofCents(5000))),
+                BookingStatus.AWAITING_PAYMENT, paymentId, paymentId + "_secret_x"));
+    }
+
+    @Test
+    void the_payment_of_an_expired_booking_is_cancelled() {
+        stock.stock.put("tkt_vip", 0);
+        givenAwaitingPayment("bkg_1", "pi_1");
+
+        expireBookings.execute();
+
+        assertThat(statusOf("bkg_1")).isEqualTo(BookingStatus.EXPIRED);
+        assertThat(payments.cancelled).containsExactly("pi_1");
+    }
+
+    @Test
+    void a_reserved_booking_without_payment_cancels_nothing() {
+        stock.stock.put("tkt_vip", 0);
+        givenBooking("bkg_1", BookingStatus.RESERVED, NOW.minus(Duration.ofHours(1)), 1, 0);
+
+        expireBookings.execute();
+
+        assertThat(payments.cancelled).isEmpty();
+    }
+
+    @Test
+    void if_the_cancel_fails_the_booking_still_expires_and_its_seats_come_back() {
+        stock.stock.put("tkt_vip", 0);
+        givenAwaitingPayment("bkg_1", "pi_1");
+        payments.cancelFailing = true;
+
+        int expired = expireBookings.execute();
+
+        assertThat(expired).isEqualTo(1);
+        assertThat(statusOf("bkg_1")).isEqualTo(BookingStatus.EXPIRED);
+        assertThat(stock.stock.get("tkt_vip")).isEqualTo(1);
     }
 }

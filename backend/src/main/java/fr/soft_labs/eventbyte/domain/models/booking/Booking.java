@@ -81,6 +81,15 @@ public class Booking {
         status = BookingStatus.AWAITING_PAYMENT;
     }
 
+    /**
+     * US-17: Stripe says the payment succeeded. Only a booking awaiting payment can be confirmed:
+     * an EXPIRED one may already have its seats sold to someone else (see HandlePaymentResult).
+     */
+    public void confirm() {
+        requireStatus(BookingStatus.AWAITING_PAYMENT);
+        status = BookingStatus.CONFIRMED;
+    }
+
     /** Not paid in time: the seats go back on sale. Only a booking that holds stock can expire. */
     public void expire() {
         if (!EXPIRABLE_STATUSES.contains(status)) {

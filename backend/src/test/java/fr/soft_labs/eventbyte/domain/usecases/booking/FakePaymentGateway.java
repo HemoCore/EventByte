@@ -8,14 +8,18 @@ import fr.soft_labs.eventbyte.domain.ports.booking.PaymentGateway;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Records every payment asked; can be switched to "Stripe is down". */
-class FakePaymentGateway implements PaymentGateway {
+/** Records every call; each operation can be switched to "Stripe is down". */
+public class FakePaymentGateway implements PaymentGateway {
 
-    record Call(String bookingId, Money amount) {
+    public record Call(String bookingId, Money amount) {
     }
 
-    final List<Call> calls = new ArrayList<>();
-    boolean failing = false;
+    public final List<Call> calls = new ArrayList<>();
+    public final List<String> cancelled = new ArrayList<>();
+    public final List<String> refunded = new ArrayList<>();
+    public boolean failing = false;
+    public boolean cancelFailing = false;
+    public boolean refundFailing = false;
 
     @Override
     public Payment createPayment(String bookingId, Money amount) {
@@ -24,5 +28,21 @@ class FakePaymentGateway implements PaymentGateway {
             throw new PaymentFailedException("Stripe is down", null);
         }
         return new Payment("pi_" + bookingId, "pi_" + bookingId + "_secret_123");
+    }
+
+    @Override
+    public void cancel(String paymentId) {
+        if (cancelFailing) {
+            throw new PaymentFailedException("Stripe is down", null);
+        }
+        cancelled.add(paymentId);
+    }
+
+    @Override
+    public void refund(String paymentId) {
+        if (refundFailing) {
+            throw new PaymentFailedException("Stripe is down", null);
+        }
+        refunded.add(paymentId);
     }
 }

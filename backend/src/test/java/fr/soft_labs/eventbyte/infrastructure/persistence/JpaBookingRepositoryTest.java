@@ -79,6 +79,21 @@ class JpaBookingRepositoryTest {
     }
 
     @Test
+    void finds_a_booking_by_its_payment() {
+        save("bkg_test_find_pay", BookingStatus.REQUESTED, NOW);
+        Booking booking = repository.findById("bkg_test_find_pay").orElseThrow();
+        booking.reserve();
+        booking.awaitPayment(new Payment("pi_test_find", "pi_test_find_secret_abc"));
+        repository.save(booking);
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(repository.findByPaymentId("pi_test_find")).get()
+                .satisfies(b -> assertThat(b.id()).isEqualTo("bkg_test_find_pay"));
+        assertThat(repository.findByPaymentId("pi_unknown")).isEmpty();
+    }
+
+    @Test
     void a_booking_without_payment_has_no_payment_columns() {
         save("bkg_test_nopay", BookingStatus.RESERVED, NOW);
         entityManager.flush();

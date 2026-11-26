@@ -42,6 +42,12 @@ public class JpaBookingRepository implements BookingRepository {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Booking> findByPaymentId(String paymentId) {
+        return springData.findByPaymentIntentId(paymentId).map(JpaBookingRepository::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Booking> findByUserId(UserId userId) {
         return springData.findByUserIdOrderByBookedAtDesc(userId.value()).stream()
                 .map(JpaBookingRepository::toDomain)
