@@ -8,7 +8,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class IngestEventTest {
 
     private final InMemoryEventRepository repository = new InMemoryEventRepository();
-    private final IngestEvent ingestEvent = new IngestEvent(repository);
+    private final InMemoryEventSearchIndex searchIndex = new InMemoryEventSearchIndex();
+    private final IngestEvent ingestEvent = new IngestEvent(repository, searchIndex);
 
     @Test
     void saves_a_new_event() {
@@ -41,5 +42,21 @@ class IngestEventTest {
         var saved = repository.findById("evt_1").orElseThrow();
         assertThat(saved.venue().name()).isEqualTo("Restaurant Prosacco");
         assertThat(saved.tickets()).hasSize(2);
+    }
+
+    @Test
+    void indexes_the_event_for_search() {
+        ingestEvent.execute(anEvent().withId("evt_1").build());
+
+        assertThat(searchIndex.contains("evt_1")).isTrue();
+    }
+
+    @Test
+    void an_update_replaces_the_indexed_document() {
+        ingestEvent.execute(anEvent().withId("evt_1").withTitle("Brunch").build());
+        ingestEvent.execute(anEvent().withId("evt_1").withTitle("Musical brunch").build());
+
+        assertThat(searchIndex.size()).isEqualTo(1);
+        assertThat(searchIndex.document("evt_1").title()).isEqualTo("Musical brunch");
     }
 }
