@@ -1,0 +1,110 @@
+# EventByte : requêtes de test de l'API (client HTTP d'IntelliJ)
+#
+# Prérequis : docker compose up -d, et le backend sur le port 8080.
+# Commencer par les deux requêtes "Token" : les tokens sont gardés pour les requêtes suivantes
+# (ils expirent après quelques minutes : relancer la requête "Token" en cas de 401).
+#
+# Données du seed utilisées :
+#   Brunch Musical   evt_01a20dce-fdec-748e-b883-754efb13d6a9 (Toulouse)
+#   ticket Standard  tkt_01a20dce-fdd2-774f-bcbf-ceac42c054fb (27,51 €)
+#   Spectacle de Cirque evt_01a20dce-fc51-710b-a781-8f79925a18d1 (Paris)
+
+@api = http://localhost:8080
+@keycloak = http://localhost:8180/realms/eventbyte/protocol/openid-connect/token
+@brunch = evt_01a20dce-fdec-748e-b883-754efb13d6a9
+@cirque = evt_01a20dce-fc51-710b-a781-8f79925a18d1
+@standard = tkt_01a20dce-fdd2-774f-bcbf-ceac42c054fb
+
+
+### ===== Authentification =====
+
+### Token d'Alice
+POST {{keycloak}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=web-app&username=alice@test.local&password=Alice1234!
+
+> {% client.global.set("token_alice", response.body.access_token); %}
+
+### Token de Bob
+POST {{keycloak}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=web-app&username=bob@test.local&password=Bob1234!
+
+> {% client.global.set("token_bob", response.body.access_token); %}
+
+
+### ===== Événements (public) =====
+
+### US-4 : événements proches de Paris
+GET {{api}}/events/discover?lat=48.8566&lng=2.3522
+
+### US-5 : détail d'un événement
+GET {{api}}/events/{{brunch}}
+
+### US-5 : événement inconnu (404)
+GET {{api}}/events/evt_inconnu
+
+### US-6 : plusieurs événements par leurs ids
+GET {{api}}/events?ids={{brunch}},{{cirque}}
+
+### US-7 : recherche par mot-clé dans un rayon
+GET {{api}}/events/search?lat=43.6047&lng=1.4442&radius=50&query=brunch
+
+### US-11 : tickets d'un événement (quantity = stock restant)
+GET {{api}}/events/{{brunch}}/tickets
+
+
+### ===== Likes (auth) =====
+
+### US-8 : liker un événement
+POST {{api}}/events/{{brunch}}/like
+Authorization: Bearer {{token_alice}}
+
+### US-9 : retirer mon like
+DELETE {{api}}/events/{{brunch}}/like
+Authorization: Bearer {{token_alice}}
+
+### US-10 : mes événements likés
+GET {{api}}/events/liked
+Authorization: Bearer {{token_alice}}
+
+### Sans token (401)
+GET {{api}}/events/liked
+
+
+### ===== Réservations (auth) =====
+
+### US-12 : réserver 1 place Standard (garde l'id de la réservation)
+POST {{api}}/bookings
+Authorization: Bearer {{token_alice}}
+Content-Type: application/json
+
+{ "items": [ { "id": "{{standard}}", "quantity": 1 } ] }
+
+> {% client.global.set("booking_id", response.body.id); %}
+
+### US-12 : demande invalide (400)
+POST {{api}}/bookings
+Authorization: Bearer {{token_alice}}
+Content-Type: application/json
+
+{ "items": [] }
+
+### US-15 : ma réservation (la dernière créée ci-dessus)
+GET {{api}}/bookings/{{booking_id}}
+Authorization: Bearer {{token_alice}}
+
+### US-15 : la réservation d'Alice vue par Bob (404)
+GET {{api}}/bookings/{{booking_id}}
+Authorization: Bearer {{token_bob}}
+
+### US-15 : toutes mes réservations
+GET {{api}}/bookings/user
+Authorization: Bearer {{token_alice}}
+
+### US-18 : suivre mes réservations en direct (SSE, reste ouvert)
+# Lancer cette requête, puis "réserver" : les booking_updated s'affichent ici.
+GET {{api}}/bookings/stream
+Authorization: Bearer {{token_alice}}
