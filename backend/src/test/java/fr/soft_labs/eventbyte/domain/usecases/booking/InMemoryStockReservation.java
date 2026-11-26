@@ -23,4 +23,10 @@ class InMemoryStockReservation implements StockReservation {
         quantityByTicketId.forEach((id, qty) -> stock.merge(id, -qty, Integer::sum));
         return true;
     }
+
+    @Override
+    public void release(Map<String, Integer> quantityByTicketId) {
+        // like release-stock.lua: only tickets that have a counter get their stock back
+        quantityByTicketId.forEach((id, qty) -> stock.computeIfPresent(id, (k, current) -> current + qty));
+    }
 }

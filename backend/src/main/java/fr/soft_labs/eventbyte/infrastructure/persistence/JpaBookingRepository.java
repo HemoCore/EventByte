@@ -8,6 +8,8 @@ import fr.soft_labs.eventbyte.domain.ports.booking.BookingRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -34,6 +36,14 @@ public class JpaBookingRepository implements BookingRepository {
     @Transactional(readOnly = true)
     public Optional<Booking> findById(String id) {
         return springData.findById(id).map(JpaBookingRepository::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Booking> findExpirable(Instant bookedBefore) {
+        return springData.findByStatusInAndBookedAtBefore(Booking.EXPIRABLE_STATUSES, bookedBefore).stream()
+                .map(JpaBookingRepository::toDomain)
+                .toList();
     }
 
     private static BookingEntity toEntity(Booking booking) {

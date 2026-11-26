@@ -5,12 +5,15 @@ import fr.soft_labs.eventbyte.domain.ports.booking.BookingRequestPublisher;
 import fr.soft_labs.eventbyte.domain.ports.booking.StockReservation;
 import fr.soft_labs.eventbyte.domain.ports.booking.TicketCatalog;
 import fr.soft_labs.eventbyte.domain.ports.shared.IdGenerator;
+import fr.soft_labs.eventbyte.domain.usecases.booking.ExpireBookings;
 import fr.soft_labs.eventbyte.domain.usecases.booking.ProcessBookingRequest;
 import fr.soft_labs.eventbyte.domain.usecases.booking.RequestBooking;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Clock;
+import java.time.Duration;
 
 @Configuration
 public class BookingUseCaseConfig {
@@ -28,5 +31,12 @@ public class BookingUseCaseConfig {
                                                 TicketCatalog ticketCatalog,
                                                 StockReservation stockReservation) {
         return new ProcessBookingRequest(bookingRepository, ticketCatalog, stockReservation);
+    }
+
+    @Bean
+    ExpireBookings expireBookings(BookingRepository bookingRepository,
+                                  StockReservation stockReservation,
+                                  @Value("${eventbyte.booking.expiration}") Duration expiration) {
+        return new ExpireBookings(bookingRepository, stockReservation, Clock.systemUTC(), expiration);
     }
 }

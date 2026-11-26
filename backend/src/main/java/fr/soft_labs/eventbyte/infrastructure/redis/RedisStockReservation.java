@@ -17,6 +17,7 @@ public class RedisStockReservation implements StockReservation {
     static final String KEY_PREFIX = "stock:";
 
     private static final RedisScript<Long> RESERVE_SCRIPT = loadScript("redis/reserve-stock.lua");
+    private static final RedisScript<Long> RELEASE_SCRIPT = loadScript("redis/release-stock.lua");
 
     private final StringRedisTemplate redis;
 
@@ -36,6 +37,20 @@ public class RedisStockReservation implements StockReservation {
 
         Long result = redis.execute(RESERVE_SCRIPT, keys, args.toArray());
         return result != null && result == 1L;
+    }
+
+    @Override
+    public void release(Map<String, Integer> quantityByTicketId) {
+        if (quantityByTicketId.isEmpty()) {
+            return;
+        }
+        List<String> keys = new ArrayList<>();
+        List<String> args = new ArrayList<>();
+        quantityByTicketId.forEach((ticketId, quantity) -> {
+            keys.add(KEY_PREFIX + ticketId);
+            args.add(String.valueOf(quantity));
+        });
+        redis.execute(RELEASE_SCRIPT, keys, args.toArray());
     }
 
     private static RedisScript<Long> loadScript(String path) {

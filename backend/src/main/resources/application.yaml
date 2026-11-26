@@ -27,6 +27,13 @@ spring:
         jwt:
           issuer-uri: http://localhost:8180/realms/eventbyte
 
+eventbyte:
+  booking:
+    # US-14: an unpaid booking expires this long after it was made, and its seats go back on sale
+    expiration: 15m
+    # how often the expiration job runs
+    expiration-check: 30s
+
 meilisearch:
   host: http://localhost:7700
   api-key: Cd9_wZ5drjqixClHEnbof-4h0bgktUzXwaY3yt8wJoM

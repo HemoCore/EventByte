@@ -97,6 +97,40 @@ class BookingTest {
         assertThatThrownBy(booking::reject).isInstanceOf(IllegalStateException.class);
     }
 
+    // --- expiration (US-14) ---
+
+    @Test
+    void a_reserved_booking_can_expire() {
+        Booking booking = newBooking();
+        booking.reserve();
+
+        booking.expire();
+
+        assertThat(booking.status()).isEqualTo(BookingStatus.EXPIRED);
+    }
+
+    @Test
+    void an_awaiting_payment_booking_can_expire() {
+        Booking booking = new Booking("bkg_1", USER, "evt_1", NOW, LINES, BookingStatus.AWAITING_PAYMENT);
+
+        booking.expire();
+
+        assertThat(booking.status()).isEqualTo(BookingStatus.EXPIRED);
+    }
+
+    @Test
+    void a_requested_booking_cannot_expire() {
+        assertThatThrownBy(newBooking()::expire).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void a_rejected_or_confirmed_or_expired_booking_cannot_expire() {
+        for (BookingStatus status : List.of(BookingStatus.REJECTED, BookingStatus.CONFIRMED, BookingStatus.EXPIRED)) {
+            Booking booking = new Booking("bkg_1", USER, "evt_1", NOW, LINES, status);
+            assertThatThrownBy(booking::expire).isInstanceOf(IllegalStateException.class);
+        }
+    }
+
     @Test
     void cannot_reserve_a_rejected_booking() {
         Booking booking = newBooking();
