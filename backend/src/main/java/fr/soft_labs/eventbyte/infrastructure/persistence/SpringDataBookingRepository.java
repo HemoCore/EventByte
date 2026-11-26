@@ -11,4 +11,7 @@ interface SpringDataBookingRepository extends JpaRepository<BookingEntity, Strin
 
     // Spring Data builds the SQL from the name: WHERE status IN (...) AND booked_at < ?
     List<BookingEntity> findByStatusInAndBookedAtBefore(Collection<BookingStatus> statuses, Instant bookedBefore);
+
+    // WHERE user_id = ? ORDER BY booked_at DESC (uses idx_bookings_user_id)
+    List<BookingEntity> findByUserIdOrderByBookedAtDesc(String userId);
 }

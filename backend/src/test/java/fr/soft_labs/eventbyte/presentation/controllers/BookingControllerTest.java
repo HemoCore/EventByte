@@ -53,6 +53,11 @@ class BookingControllerTest {
         }
 
         @Override
+        public List<Booking> findByUserId(UserId userId) {
+            return List.of();
+        }
+
+        @Override
         public List<Booking> findExpirable(Instant bookedBefore) {
             return List.of();
         }

@@ -1,15 +1,17 @@
 package fr.soft_labs.eventbyte.domain.usecases.booking;
 
 import fr.soft_labs.eventbyte.domain.models.booking.Booking;
+import fr.soft_labs.eventbyte.domain.models.user.UserId;
 import fr.soft_labs.eventbyte.domain.ports.booking.BookingRepository;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-class InMemoryBookingRepository implements BookingRepository {
+public class InMemoryBookingRepository implements BookingRepository {
 
     private final Map<String, Booking> bookings = new HashMap<>();
 
@@ -21,6 +23,14 @@ class InMemoryBookingRepository implements BookingRepository {
     @Override
     public Optional<Booking> findById(String id) {
         return Optional.ofNullable(bookings.get(id));
+    }
+
+    @Override
+    public List<Booking> findByUserId(UserId userId) {
+        return bookings.values().stream()
+                .filter(b -> b.userId().equals(userId))
+                .sorted(Comparator.comparing(Booking::bookedAt).reversed())
+                .toList();
     }
 
     @Override

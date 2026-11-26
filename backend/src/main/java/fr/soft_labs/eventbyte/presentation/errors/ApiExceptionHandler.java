@@ -1,5 +1,6 @@
 package fr.soft_labs.eventbyte.presentation.errors;
 
+import fr.soft_labs.eventbyte.domain.models.booking.BookingNotFoundException;
 import fr.soft_labs.eventbyte.domain.models.event.EventNotFoundException;
 import fr.soft_labs.eventbyte.domain.models.event.TicketNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,11 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(EventNotFoundException.class)
     public ProblemDetail handleEventNotFound(EventNotFoundException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(BookingNotFoundException.class)
+    public ProblemDetail handleBookingNotFound(BookingNotFoundException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
