@@ -25,6 +25,23 @@ class MoneyTest {
     }
 
     @Test
+    void converts_cents_to_euros() {
+        assertThat(Money.ofCents(1535).euros()).isEqualTo(new BigDecimal("15.35"));
+    }
+
+    @Test
+    void euros_keep_two_decimals() {
+        assertThat(Money.ofCents(2500).euros()).isEqualTo(new BigDecimal("25.00"));
+        assertThat(Money.ofCents(5).euros()).isEqualTo(new BigDecimal("0.05"));
+        assertThat(Money.ofCents(0).euros()).isEqualTo(new BigDecimal("0.00"));
+    }
+
+    @Test
+    void euros_and_back_give_the_same_cents() {
+        assertThat(Money.fromEuros(Money.ofCents(2751).euros()).cents()).isEqualTo(2751);
+    }
+
+    @Test
     void rejects_a_negative_amount() {
         assertThatThrownBy(() -> Money.fromEuros(new BigDecimal("-1")))
                 .isInstanceOf(IllegalArgumentException.class);

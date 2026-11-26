@@ -22,6 +22,11 @@ public record Money(long cents) {
         return new Money(euros.setScale(2, RoundingMode.HALF_UP).movePointRight(2).longValueExact());
     }
 
+    /** The amount in euros, e.g. 1535 cents → 15.35. Only for the JSON answers: inside, everything stays in cents. */
+    public BigDecimal euros() {
+        return BigDecimal.valueOf(cents, 2);
+    }
+
     public boolean isLessThan(Money other) {
         return cents < other.cents;
     }

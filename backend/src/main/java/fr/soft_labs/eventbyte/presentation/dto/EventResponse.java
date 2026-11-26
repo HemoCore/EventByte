@@ -5,6 +5,7 @@ import fr.soft_labs.eventbyte.domain.models.event.Event;
 import fr.soft_labs.eventbyte.domain.models.event.EventSummary;
 import fr.soft_labs.eventbyte.domain.models.event.Venue;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 public record EventResponse(
@@ -15,7 +16,7 @@ public record EventResponse(
         VenueResponse venue,
         @JsonProperty("isSoldOut") boolean isSoldOut,
         Instant startAt,
-        long lowestPrice,
+        BigDecimal lowestPrice,   // in euros (e.g. 27.51); inside, Money stays in cents
         String description
 ) {
 
@@ -37,7 +38,7 @@ public record EventResponse(
                         new CoordinatesResponse(venue.latitude(), venue.longitude())),
                 summary.soldOut(),
                 event.startAt(),
-                summary.lowestPrice().cents(),
+                summary.lowestPrice().euros(),
                 nullToEmpty(event.description())
         );
     }
