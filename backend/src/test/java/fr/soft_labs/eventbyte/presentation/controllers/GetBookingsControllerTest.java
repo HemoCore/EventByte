@@ -18,6 +18,8 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,12 +65,24 @@ class GetBookingsControllerTest {
                 .andExpect(jsonPath("$.lines[0].id").value("tkt_vip"))
                 .andExpect(jsonPath("$.lines[0].name").value("VIP"))
                 .andExpect(jsonPath("$.lines[0].quantity").value(2))
-                .andExpect(jsonPath("$.lines[0].price").value(5000))
+                .andExpect(jsonPath("$.lines[0].price").value(50.0)) // euros (5000 cents)
                 .andExpect(jsonPath("$.status").value("awaiting-payment"))
                 // US-16: 3 tickets x 30 cents of fees, total = 11500 + 90
-                .andExpect(jsonPath("$.total").value(11590))
-                .andExpect(jsonPath("$.fees").value(90))
+                .andExpect(jsonPath("$.total").value(115.9)) // 115.90 € (11590 cents)
+                .andExpect(jsonPath("$.fees").value(0.9)) // 0.90 € = 3 tickets x 0.30 €
                 .andExpect(jsonPath("$.clientSecret").value("pi_1_secret_abc"));
+    }
+
+    @Test
+    void amounts_are_sent_in_euros_with_two_decimals() throws Exception {
+        givenBooking("bkg_3", ALICE, "2026-11-25T10:00:00Z", BookingStatus.RESERVED);
+
+        mockMvc.perform(get("/bookings/bkg_3"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"price\":50.00")))
+                .andExpect(content().string(containsString("\"price\":15.00")))
+                .andExpect(content().string(containsString("\"total\":115.90")))
+                .andExpect(content().string(containsString("\"fees\":0.90")));
     }
 
     @Test
@@ -78,7 +92,7 @@ class GetBookingsControllerTest {
         mockMvc.perform(get("/bookings/bkg_2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("reserved"))
-                .andExpect(jsonPath("$.fees").value(90))
+                .andExpect(jsonPath("$.fees").value(0.9)) // 0.90 € = 3 tickets x 0.30 €
                 .andExpect(jsonPath("$.clientSecret").doesNotExist());
     }
 

@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import fr.soft_labs.eventbyte.domain.models.booking.Booking;
 import fr.soft_labs.eventbyte.domain.models.booking.BookingLine;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
 // README: Booking = { id, eventId, bookedAt, lines, status, total, fees, clientSecret? }
-// US-16: total = tickets + fees, in cents; clientSecret only once the booking is awaiting payment
+// US-16: total = tickets + fees; clientSecret only once the booking is awaiting payment.
+// Amounts in euros (e.g. 15.35): the frontend displays the number as euros.
+// Inside (Money, database, Stripe) everything stays in cents.
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record BookingResponse(
         String id,
@@ -16,15 +19,15 @@ public record BookingResponse(
         Instant bookedAt,
         List<LineResponse> lines,
         String status,
-        long total,
-        long fees,
+        BigDecimal total,
+        BigDecimal fees,
         String clientSecret
 ) {
 
-    public record LineResponse(String id, String name, int quantity, long price) {
+    public record LineResponse(String id, String name, int quantity, BigDecimal price) {
 
         static LineResponse from(BookingLine line) {
-            return new LineResponse(line.ticketId(), line.name(), line.quantity(), line.unitPrice().cents());
+            return new LineResponse(line.ticketId(), line.name(), line.quantity(), line.unitPrice().euros());
         }
     }
 
@@ -35,8 +38,8 @@ public record BookingResponse(
                 booking.bookedAt(),
                 booking.lines().stream().map(LineResponse::from).toList(),
                 booking.status().value(),
-                booking.total().cents(),
-                booking.fees().cents(),
+                booking.total().euros(),
+                booking.fees().euros(),
                 booking.clientSecret());
     }
 }

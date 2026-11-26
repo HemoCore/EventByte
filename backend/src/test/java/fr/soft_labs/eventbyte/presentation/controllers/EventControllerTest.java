@@ -63,7 +63,7 @@ class EventControllerTest {
                 .andExpect(jsonPath("$.title").value("Brunch"))
                 .andExpect(jsonPath("$.likedCount").value(4))
                 .andExpect(jsonPath("$.isSoldOut").value(false))
-                .andExpect(jsonPath("$.lowestPrice").value(2751))
+                .andExpect(jsonPath("$.lowestPrice").value(27.51)) // euros (2751 cents)
                 .andExpect(jsonPath("$.startAt").value("2026-12-29T17:00:00Z"))
                 .andExpect(jsonPath("$.venue.adresse").value("111 Place Voltaire, 31000 Toulouse"))
                 .andExpect(jsonPath("$.venue.coordinates.latitude").value(43.626))
@@ -85,7 +85,7 @@ class EventControllerTest {
                 .andExpect(jsonPath("$[0].id").value("tkt_1"))
                 .andExpect(jsonPath("$[0].eventId").value("evt_1"))
                 .andExpect(jsonPath("$[0].name").value("Standard"))
-                .andExpect(jsonPath("$[0].price").value(2751))
+                .andExpect(jsonPath("$[0].price").value(27.51)) // euros (2751 cents)
                 .andExpect(jsonPath("$[0].quantity").value(5))
                 .andExpect(jsonPath("$[1].id").value("tkt_2"))
                 .andExpect(jsonPath("$[1].quantity").value(0));

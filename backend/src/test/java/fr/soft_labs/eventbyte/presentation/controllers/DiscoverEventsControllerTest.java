@@ -42,7 +42,7 @@ class DiscoverEventsControllerTest {
                 .andExpect(jsonPath("$[0].id").value("evt_1"))
                 .andExpect(jsonPath("$[0].likedCount").value(2))
                 .andExpect(jsonPath("$[0].isSoldOut").value(true))
-                .andExpect(jsonPath("$[0].lowestPrice").value(2751))
+                .andExpect(jsonPath("$[0].lowestPrice").value(27.51)) // euros (2751 cents)
                 .andExpect(jsonPath("$[0].startAt").value("2026-12-29T17:00:00Z"))
                 .andExpect(jsonPath("$[0].venue.adresse").exists())
                 .andExpect(jsonPath("$[0].venue.coordinates.latitude").exists());
