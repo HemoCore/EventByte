@@ -5,8 +5,13 @@ import fr.soft_labs.eventbyte.domain.models.user.UserId;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 public class Booking {
+
+    /** Statuses that hold stock and are not paid yet: they expire after the delay (US-14). */
+    public static final Set<BookingStatus> EXPIRABLE_STATUSES =
+            Set.of(BookingStatus.RESERVED, BookingStatus.AWAITING_PAYMENT);
 
     private final String id;
     private final UserId userId;
@@ -49,6 +54,14 @@ public class Booking {
     public void reject() {
         requireStatus(BookingStatus.REQUESTED);
         status = BookingStatus.REJECTED;
+    }
+
+    /** Not paid in time: the seats go back on sale. Only a booking that holds stock can expire. */
+    public void expire() {
+        if (!EXPIRABLE_STATUSES.contains(status)) {
+            throw new IllegalStateException("Booking " + id + " is " + status + ", it cannot expire");
+        }
+        status = BookingStatus.EXPIRED;
     }
 
     public boolean isRequested() {

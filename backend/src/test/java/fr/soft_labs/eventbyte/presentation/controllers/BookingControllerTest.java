@@ -51,6 +51,11 @@ class BookingControllerTest {
         public Optional<Booking> findById(String id) {
             return Optional.empty();
         }
+
+        @Override
+        public List<Booking> findExpirable(Instant bookedBefore) {
+            return List.of();
+        }
     };
 
     private final CurrentUser currentUser = new CurrentUser() {

@@ -85,6 +85,35 @@ class RedisStockReservationTest {
     }
 
     @Test
+    void release_gives_the_stock_back() {
+        redis.template.opsForValue().set("stock:" + ticketA, "0");
+        redis.template.opsForValue().set("stock:" + ticketB, "3");
+
+        reservation.release(Map.of(ticketA, 2, ticketB, 1));
+
+        assertThat(stockOf(ticketA)).isEqualTo("2");
+        assertThat(stockOf(ticketB)).isEqualTo("4");
+    }
+
+    @Test
+    void release_does_not_create_a_missing_stock() {
+        reservation.release(Map.of(ticketA, 2));
+
+        assertThat(stockOf(ticketA)).isNull();
+    }
+
+    @Test
+    void a_released_seat_can_be_reserved_again() {
+        redis.template.opsForValue().set("stock:" + ticketA, "0");
+        assertThat(reservation.reserve(Map.of(ticketA, 1), Map.of(ticketA, 1))).isFalse();
+
+        reservation.release(Map.of(ticketA, 1));
+
+        assertThat(reservation.reserve(Map.of(ticketA, 1), Map.of(ticketA, 1))).isTrue();
+        assertThat(stockOf(ticketA)).isEqualTo("0");
+    }
+
+    @Test
     void nothing_is_taken_when_one_ticket_lacks_stock() {
         redis.template.opsForValue().set("stock:" + ticketA, "5");
         redis.template.opsForValue().set("stock:" + ticketB, "0");
