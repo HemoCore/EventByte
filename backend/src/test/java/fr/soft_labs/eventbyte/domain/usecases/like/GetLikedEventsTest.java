@@ -7,6 +7,7 @@ import fr.soft_labs.eventbyte.domain.models.user.UserId;
 import fr.soft_labs.eventbyte.domain.ports.event.LikeCounter;
 import fr.soft_labs.eventbyte.domain.ports.event.TicketAvailability;
 import fr.soft_labs.eventbyte.domain.usecases.event.EventSummaryAssembler;
+import fr.soft_labs.eventbyte.domain.usecases.event.GetEventsByIds;
 import fr.soft_labs.eventbyte.domain.usecases.event.InMemoryEventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,8 @@ class GetLikedEventsTest {
             .collect(Collectors.toMap(Ticket::id, Ticket::quantity));
 
     private final GetLikedEvents getLikedEvents = new GetLikedEvents(
-            likeRepository, eventRepository, new EventSummaryAssembler(likeCounter, ticketAvailability));
+            likeRepository,
+            new GetEventsByIds(eventRepository, new EventSummaryAssembler(likeCounter, ticketAvailability)));
 
     @BeforeEach
     void setUp() {

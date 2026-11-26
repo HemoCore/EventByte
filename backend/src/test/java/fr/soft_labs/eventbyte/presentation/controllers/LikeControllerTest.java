@@ -3,6 +3,7 @@ package fr.soft_labs.eventbyte.presentation.controllers;
 import fr.soft_labs.eventbyte.domain.models.event.Ticket;
 import fr.soft_labs.eventbyte.domain.models.user.UserId;
 import fr.soft_labs.eventbyte.domain.usecases.event.EventSummaryAssembler;
+import fr.soft_labs.eventbyte.domain.usecases.event.GetEventsByIds;
 import fr.soft_labs.eventbyte.domain.usecases.event.InMemoryEventRepository;
 import fr.soft_labs.eventbyte.domain.usecases.like.GetLikedEvents;
 import fr.soft_labs.eventbyte.domain.usecases.like.InMemoryLikeRepository;
@@ -46,7 +47,7 @@ class LikeControllerTest {
             .standaloneSetup(new LikeController(
                     new LikeEvent(likeRepository, eventRepository),
                     new UnlikeEvent(likeRepository),
-                    new GetLikedEvents(likeRepository, eventRepository, assembler),
+                    new GetLikedEvents(likeRepository, new GetEventsByIds(eventRepository, assembler)),
                     currentUser))
             .setControllerAdvice(new ApiExceptionHandler())
             .build();
