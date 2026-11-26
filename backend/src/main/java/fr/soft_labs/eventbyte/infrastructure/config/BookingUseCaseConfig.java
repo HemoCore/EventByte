@@ -10,6 +10,7 @@ import fr.soft_labs.eventbyte.domain.ports.shared.IdGenerator;
 import fr.soft_labs.eventbyte.domain.usecases.booking.ExpireBookings;
 import fr.soft_labs.eventbyte.domain.usecases.booking.GetBooking;
 import fr.soft_labs.eventbyte.domain.usecases.booking.GetUserBookings;
+import fr.soft_labs.eventbyte.domain.usecases.booking.HandlePaymentResult;
 import fr.soft_labs.eventbyte.domain.usecases.booking.NotifyingBookingRepository;
 import fr.soft_labs.eventbyte.domain.usecases.booking.ProcessBookingRequest;
 import fr.soft_labs.eventbyte.domain.usecases.booking.RequestBooking;
@@ -54,8 +55,14 @@ public class BookingUseCaseConfig {
     @Bean
     ExpireBookings expireBookings(BookingRepository bookingRepository,
                                   StockReservation stockReservation,
+                                  PaymentGateway paymentGateway,
                                   @Value("${eventbyte.booking.expiration}") Duration expiration) {
-        return new ExpireBookings(bookingRepository, stockReservation, Clock.systemUTC(), expiration);
+        return new ExpireBookings(bookingRepository, stockReservation, paymentGateway, Clock.systemUTC(), expiration);
+    }
+
+    @Bean
+    HandlePaymentResult handlePaymentResult(BookingRepository bookingRepository, PaymentGateway paymentGateway) {
+        return new HandlePaymentResult(bookingRepository, paymentGateway);
     }
 
     @Bean

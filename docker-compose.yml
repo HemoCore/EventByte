@@ -101,6 +101,8 @@ services:
       MEILISEARCH_HOST: http://meilisearch:7700
       # US-16: taken from the shell, e.g. PowerShell: $env:STRIPE_SECRET_KEY="sk_test_..." (empty = no payment)
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      # US-17: webhook signing secret (whsec_...), e.g. from "stripe listen" (empty = webhooks refused)
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
     depends_on:
       - postgres
       - rabbitmq

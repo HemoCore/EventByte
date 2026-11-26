@@ -36,6 +36,11 @@ public class NotifyingBookingRepository implements BookingRepository {
     }
 
     @Override
+    public Optional<Booking> findByPaymentId(String paymentId) {
+        return delegate.findByPaymentId(paymentId);
+    }
+
+    @Override
     public List<Booking> findByUserId(UserId userId) {
         return delegate.findByUserId(userId);
     }

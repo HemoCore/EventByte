@@ -27,6 +27,8 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/events/liked").authenticated()
                         .requestMatchers(HttpMethod.GET, "/events", "/events/**").permitAll()
+                        // US-17: Stripe sends no JWT; the controller checks the Stripe signature instead
+                        .requestMatchers(HttpMethod.POST, "/webhooks/stripe").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 

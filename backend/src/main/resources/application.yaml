@@ -38,6 +38,9 @@ eventbyte:
 # Empty = the app still starts, but bookings stay "reserved" (no payment) and expire after the delay.
 stripe:
   secret-key: ${STRIPE_SECRET_KEY:}
+  # US-17: signing secret of the webhook (whsec_..., given by "stripe listen" or the Stripe dashboard).
+  # Empty = the app still starts, but every webhook is refused (400) and bookings stay "awaiting-payment".
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
 
 meilisearch:
   host: http://localhost:7700

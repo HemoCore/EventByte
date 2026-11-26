@@ -115,6 +115,34 @@ class BookingTest {
         assertThatThrownBy(() -> new Payment("pi_1", null)).isInstanceOf(IllegalArgumentException.class);
     }
 
+    // --- confirmation (US-17) ---
+
+    @Test
+    void an_awaiting_payment_booking_can_be_confirmed() {
+        Booking booking = new Booking("bkg_1", USER, "evt_1", NOW, LINES, BookingStatus.AWAITING_PAYMENT,
+                "pi_1", "pi_1_secret_abc");
+
+        booking.confirm();
+
+        assertThat(booking.status()).isEqualTo(BookingStatus.CONFIRMED);
+    }
+
+    @Test
+    void only_an_awaiting_payment_booking_can_be_confirmed() {
+        for (BookingStatus status : List.of(BookingStatus.REQUESTED, BookingStatus.RESERVED,
+                BookingStatus.REJECTED, BookingStatus.EXPIRED, BookingStatus.CONFIRMED)) {
+            Booking booking = new Booking("bkg_1", USER, "evt_1", NOW, LINES, status);
+            assertThatThrownBy(booking::confirm).isInstanceOf(IllegalStateException.class);
+        }
+    }
+
+    @Test
+    void a_confirmed_booking_never_expires() {
+        Booking booking = new Booking("bkg_1", USER, "evt_1", NOW, LINES, BookingStatus.CONFIRMED);
+
+        assertThatThrownBy(booking::expire).isInstanceOf(IllegalStateException.class);
+    }
+
     @Test
     void an_awaiting_payment_booking_still_expires() {
         Booking booking = newBooking();

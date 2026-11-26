@@ -53,6 +53,11 @@ class BookingControllerTest {
         }
 
         @Override
+        public Optional<Booking> findByPaymentId(String paymentId) {
+            return Optional.empty();
+        }
+
+        @Override
         public List<Booking> findByUserId(UserId userId) {
             return List.of();
         }
