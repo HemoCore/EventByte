@@ -43,10 +43,10 @@ class EventControllerTest {
     };
 
     // stock restant : 5 Standard (21 au départ), Premium épuisé (78 au départ)
-    private final TicketAvailability availability = tickets -> Map.of("tkt_1", 5, "tkt_2", 0);
+    private final TicketAvailability availability = _ -> Map.of("tkt_1", 5, "tkt_2", 0);
 
     private final GetEvent getEvent = new GetEvent(repository,
-            new EventSummaryAssembler(ids -> Map.of("evt_1", 4L), availability));
+            new EventSummaryAssembler(_ -> Map.of("evt_1", 4L), availability));
 
     private final GetEventTickets getEventTickets = new GetEventTickets(repository, availability);
 
