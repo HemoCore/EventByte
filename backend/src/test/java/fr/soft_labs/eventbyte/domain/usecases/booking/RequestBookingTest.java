@@ -44,7 +44,7 @@ class RequestBookingTest {
         assertThat(saved.userId()).isEqualTo(USER);
         assertThat(saved.eventId()).isEqualTo("evt_1");
         assertThat(saved.bookedAt()).isEqualTo(NOW);
-        assertThat(saved.total()).isEqualTo(Money.ofCents(11500));
+        assertThat(saved.total()).isEqualTo(Money.ofCents(11590)); // 11500 + 3 tickets x 30 cents of fees
     }
 
     @Test

@@ -49,7 +49,10 @@ class GetBookingsControllerTest {
 
     @Test
     void returns_my_booking_in_the_api_format() throws Exception {
-        givenBooking("bkg_1", ALICE, "2026-11-25T10:00:00Z", BookingStatus.AWAITING_PAYMENT);
+        repository.save(new Booking("bkg_1", ALICE, "evt_1", Instant.parse("2026-11-25T10:00:00Z"), List.of(
+                new BookingLine("tkt_vip", "VIP", 2, Money.ofCents(5000)),
+                new BookingLine("tkt_early", "Early Bird", 1, Money.ofCents(1500))),
+                BookingStatus.AWAITING_PAYMENT, "pi_1", "pi_1_secret_abc"));
 
         mockMvc.perform(get("/bookings/bkg_1"))
                 .andExpect(status().isOk())
@@ -62,8 +65,21 @@ class GetBookingsControllerTest {
                 .andExpect(jsonPath("$.lines[0].quantity").value(2))
                 .andExpect(jsonPath("$.lines[0].price").value(5000))
                 .andExpect(jsonPath("$.status").value("awaiting-payment"))
-                .andExpect(jsonPath("$.total").value(11500))
-                .andExpect(jsonPath("$.fees").value(0));
+                // US-16: 3 tickets x 30 cents of fees, total = 11500 + 90
+                .andExpect(jsonPath("$.total").value(11590))
+                .andExpect(jsonPath("$.fees").value(90))
+                .andExpect(jsonPath("$.clientSecret").value("pi_1_secret_abc"));
+    }
+
+    @Test
+    void a_booking_without_payment_has_no_client_secret_field() throws Exception {
+        givenBooking("bkg_2", ALICE, "2026-11-25T10:00:00Z", BookingStatus.RESERVED);
+
+        mockMvc.perform(get("/bookings/bkg_2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("reserved"))
+                .andExpect(jsonPath("$.fees").value(90))
+                .andExpect(jsonPath("$.clientSecret").doesNotExist());
     }
 
     @Test

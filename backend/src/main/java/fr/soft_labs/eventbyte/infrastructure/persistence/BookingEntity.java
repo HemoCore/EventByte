@@ -36,6 +36,12 @@ public class BookingEntity {
     @Column(nullable = false)
     private BookingStatus status;
 
+    @Column(name = "payment_intent_id")
+    private String paymentIntentId;
+
+    @Column(name = "client_secret")
+    private String clientSecret;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "booking_lines", joinColumns = @JoinColumn(name = "booking_id"))
     private List<BookingLineEmbeddable> lines = new ArrayList<>();
@@ -59,5 +65,9 @@ public class BookingEntity {
     public Instant getBookedAt() { return bookedAt; }
     public BookingStatus getStatus() { return status; }
     public void setStatus(BookingStatus status) { this.status = status; }
+    public String getPaymentIntentId() { return paymentIntentId; }
+    public void setPaymentIntentId(String paymentIntentId) { this.paymentIntentId = paymentIntentId; }
+    public String getClientSecret() { return clientSecret; }
+    public void setClientSecret(String clientSecret) { this.clientSecret = clientSecret; }
     public List<BookingLineEmbeddable> getLines() { return lines; }
 }

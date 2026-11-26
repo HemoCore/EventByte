@@ -3,6 +3,7 @@ package fr.soft_labs.eventbyte.infrastructure.config;
 import fr.soft_labs.eventbyte.domain.ports.booking.BookingNotifier;
 import fr.soft_labs.eventbyte.domain.ports.booking.BookingRepository;
 import fr.soft_labs.eventbyte.domain.ports.booking.BookingRequestPublisher;
+import fr.soft_labs.eventbyte.domain.ports.booking.PaymentGateway;
 import fr.soft_labs.eventbyte.domain.ports.booking.StockReservation;
 import fr.soft_labs.eventbyte.domain.ports.booking.TicketCatalog;
 import fr.soft_labs.eventbyte.domain.ports.shared.IdGenerator;
@@ -35,8 +36,9 @@ public class BookingUseCaseConfig {
     @Bean
     ProcessBookingRequest processBookingRequest(BookingRepository bookingRepository,
                                                 TicketCatalog ticketCatalog,
-                                                StockReservation stockReservation) {
-        return new ProcessBookingRequest(bookingRepository, ticketCatalog, stockReservation);
+                                                StockReservation stockReservation,
+                                                PaymentGateway paymentGateway) {
+        return new ProcessBookingRequest(bookingRepository, ticketCatalog, stockReservation, paymentGateway);
     }
 
     @Bean

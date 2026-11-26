@@ -99,6 +99,8 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: http://keycloak:8080/realms/eventbyte/protocol/openid-connect/certs
       MEILISEARCH_HOST: http://meilisearch:7700
+      # US-16: taken from the shell, e.g. PowerShell: $env:STRIPE_SECRET_KEY="sk_test_..." (empty = no payment)
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
     depends_on:
       - postgres
       - rabbitmq

@@ -34,6 +34,11 @@ eventbyte:
     # how often the expiration job runs
     expiration-check: 30s
 
+# US-16: Stripe secret test key (sk_test_...), given by the STRIPE_SECRET_KEY environment variable.
+# Empty = the app still starts, but bookings stay "reserved" (no payment) and expire after the delay.
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY:}
+
 meilisearch:
   host: http://localhost:7700
   api-key: Cd9_wZ5drjqixClHEnbof-4h0bgktUzXwaY3yt8wJoM
