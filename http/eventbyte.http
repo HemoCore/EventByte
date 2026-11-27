@@ -50,7 +50,7 @@ GET {{api}}/events/evt_inconnu
 GET {{api}}/events?ids={{brunch}},{{cirque}}
 
 ### US-7 : recherche par mot-clé dans un rayon
-GET {{api}}/events/search?lat=43.6047&lng=1.4442&radius=50&query=brunch
+GET {{api}}/events/search?lat=43.6047&lng=1.4442&radius=50000&query=brunch
 
 ### US-11 : tickets d'un événement (quantity = stock restant)
 GET {{api}}/events/{{brunch}}/tickets

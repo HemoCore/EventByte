@@ -44,7 +44,7 @@ class SearchEventsControllerTest {
     void returns_the_matching_events_in_the_api_format() throws Exception {
         mockMvc.perform(get("/events/search")
                         .param("lat", "43.6047").param("lng", "1.4442")
-                        .param("radius", "20").param("query", "brunch"))
+                        .param("radius", "20000").param("query", "brunch"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value("evt_1"))
                 .andExpect(jsonPath("$[0].title").value("Brunch"))
@@ -58,10 +58,18 @@ class SearchEventsControllerTest {
     @Test
     void the_query_is_optional() throws Exception {
         mockMvc.perform(get("/events/search")
-                        .param("lat", "43.6047").param("lng", "1.4442").param("radius", "20"))
+                        .param("lat", "43.6047").param("lng", "1.4442").param("radius", "20000"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value("evt_1"));
         assertThat(searchIndex.queries()).containsExactly("");
+    }
+
+    @Test
+    void the_radius_is_in_meters() throws Exception {
+        mockMvc.perform(get("/events/search")
+                        .param("lat", "43.6047").param("lng", "1.4442").param("radius", "5000"))
+                .andExpect(status().isOk());
+        assertThat(searchIndex.radiiKm()).containsExactly(5.0);
     }
 
     @Test
@@ -73,7 +81,7 @@ class SearchEventsControllerTest {
     @Test
     void returns_400_when_the_radius_is_not_positive() throws Exception {
         mockMvc.perform(get("/events/search")
-                        .param("lat", "43.6").param("lng", "1.4").param("radius", "-3"))
+                        .param("lat", "43.6").param("lng", "1.4").param("radius", "-3000"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("Rayon invalide : -3.0"));
     }
@@ -81,7 +89,7 @@ class SearchEventsControllerTest {
     @Test
     void returns_400_when_the_position_is_invalid() throws Exception {
         mockMvc.perform(get("/events/search")
-                        .param("lat", "120").param("lng", "1.4").param("radius", "10"))
+                        .param("lat", "120").param("lng", "1.4").param("radius", "10000"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("Latitude invalide : 120.0"));
     }

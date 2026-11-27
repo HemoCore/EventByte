@@ -17,6 +17,7 @@ public class InMemoryEventSearchIndex implements EventSearchIndex {
 
     private final Map<String, Event> documents = new LinkedHashMap<>();
     private final List<String> queries = new ArrayList<>();
+    private final List<Double> radiiKm = new ArrayList<>();
     private List<String> fixedResults;
     private int indexCalls;
 
@@ -40,6 +41,7 @@ public class InMemoryEventSearchIndex implements EventSearchIndex {
     @Override
     public List<String> search(String query, Coordinates center, double radiusKm, Instant from, int limit) {
         queries.add(query);
+        radiiKm.add(radiusKm);
         if (fixedResults != null) {
             return fixedResults;
         }
@@ -69,6 +71,10 @@ public class InMemoryEventSearchIndex implements EventSearchIndex {
 
     public List<String> queries() {
         return queries;
+    }
+
+    public List<Double> radiiKm() {
+        return radiiKm;
     }
 
     public int indexCalls() {
