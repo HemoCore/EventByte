@@ -18,11 +18,15 @@ public class SearchEventsController {
         this.searchEvents = searchEvents;
     }
 
+    private static final double METERS_PER_KM = 1000;
+
+    // radius in meters: the frontend sends the value of its distance menu (5000 = 5 km)
     @GetMapping("/events/search")
     public List<EventResponse> search(@RequestParam double lat, @RequestParam double lng,
                                       @RequestParam double radius,
                                       @RequestParam(defaultValue = "") String query) {
-        return searchEvents.execute(query, new Coordinates(lat, lng), radius).stream()
+        double radiusKm = radius / METERS_PER_KM;
+        return searchEvents.execute(query, new Coordinates(lat, lng), radiusKm).stream()
                 .map(EventResponse::from)
                 .toList();
     }
